@@ -1,0 +1,24 @@
+﻿<div class="dialog-container">
+    <div class="dialog">
+        <div class="dialog-title">
+            <h2>Add TODO</h2>
+        </div>
+        <div class="dialog-body">
+            <input type="checkbox" @bind="ToDo.IsDone" />
+            <input @bind="ToDo.Title" />
+
+            <div class="dialog-buttons">
+                <button class="btn btn-secondary mr-auto" @onclick="OnCancel">Cancel</button>
+                <button class="btn btn-success ml-auto" @onclick="OnConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter] public TodoItem ToDo { get; set; }
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+}

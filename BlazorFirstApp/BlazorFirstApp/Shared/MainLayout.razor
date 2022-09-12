@@ -1,0 +1,25 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>BlazorFirstApp</PageTitle>
+
+<div class="page">
+    <div class="sidebar">
+        @*navmenu component*@
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @*cascade parameter will be available to any component inside this tag*@
+            <CascadingValue Name="User" Value='"Pesho"'>
+                @*here will be placed the content of the pages*@
+                @Body
+            </CascadingValue>
+
+        </article>
+    </main>
+</div>

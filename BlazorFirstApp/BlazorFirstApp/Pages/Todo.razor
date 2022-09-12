@@ -1,0 +1,84 @@
+﻿@page "/todo"
+
+<h3>Todo (@todos.Count(todo => !todo.IsDone))</h3>
+
+@*show todos list*@
+<ul>
+    @foreach (var todo in todos)
+    {
+        <li>
+            @*data binding with the @bind attribute*@
+            <input type="checkbox" @bind="todo.IsDone" />
+            <input @bind="todo.Title" />
+        </li>
+    }
+</ul>
+
+@*add a todo*@
+
+@*data and event binding*@
+<input @bind="newTodo" @bind:event="oninput" placeholder="Something to do..." />
+@*data and format binding*@
+<input @bind="dueDate" @bind:format="yyyy-MM-dd" placeholder="Due date..." />
+<button @onclick="AddTodo">Add todo</button>
+<br />
+<br />
+
+@*add a todo with modal popup*@
+<button class="btn btn-primary" @onclick="@((e) => ShowPopupDialog())">Open TODO modal</button>
+
+@*add todo via modal dialog*@
+@if (showModalDialog)
+{
+    @*pass data and callbacks to component*@
+    <AddTodoModal ToDo="newTodoItem" OnConfirm="ConfirmDialog" OnCancel="CancelDialog" />
+}
+
+@if (!string.IsNullOrEmpty(newTodo))
+{
+    <p>@newTodo due: @dueDate?.ToShortDateString()</p>
+}
+
+@code {
+    private List<TodoItem> todos = new();
+    private string newTodo = string.Empty;
+    private DateTime? dueDate = null;
+
+    private void AddTodo()
+    {
+        if (!string.IsNullOrWhiteSpace(newTodo))
+        {
+            // create and add new TodoItem to the list
+            todos.Add(new TodoItem { Title = newTodo });
+            // reset newTodo
+            newTodo = string.Empty;
+        }
+    }
+
+    TodoItem? newTodoItem;
+    bool showModalDialog;
+
+    void ShowPopupDialog()
+    {
+        newTodoItem = new TodoItem()
+            {
+                Title = "New TODO",
+                IsDone = false
+            };
+
+        showModalDialog = !showModalDialog;
+    }
+
+    void CancelDialog()
+    {
+        newTodoItem = null;
+        showModalDialog = false;
+    }
+
+    void ConfirmDialog()
+    {
+        todos.Add(newTodoItem);
+        newTodoItem = null;
+        showModalDialog = false;
+    }
+}

@@ -1,0 +1,23 @@
+﻿@*use page directive to specify a route where show this page when routing to /*@
+@page "/"
+
+@*inject persiting State (add scoped in Program.cs)*@
+@inject State State
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, @User!</h1>
+<h3>Your role is: @State.Role</h3>
+
+Welcome to your new app.
+
+@*included component*@
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+@*included component with param*@
+<Counter IncrementAmount="10" />
+
+@code {
+    //use cascading parameter from MainLayout
+    [CascadingParameter(Name = "User")] protected string User { get; set; }
+}
