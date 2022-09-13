@@ -1,0 +1,54 @@
+﻿@page "/form"
+@inject State State
+
+<h3>Form</h3>
+<h5>@State.Author</h5>
+@*EditForm load data into model*@
+@*when form is submitted setAuthor method will be executed*@
+<EditForm Model="State" OnValidSubmit="setAuthor">
+    <div class="dialog-buttons">
+        <div class="form-field">
+            <label>Name:</label>
+            <div>
+                <InputText @bind-Value="State.Author" />
+                <ValidationMessage For="@(() => State.Author)" />
+            </div>
+        </div>
+        <button type="submit" disabled="@isSubmitting">Submit</button>
+    </div>
+
+    <DataAnnotationsValidator />
+
+    <hr />
+    <p>Validation summary:</p>
+    <ValidationSummary />
+   
+</EditForm>
+
+@code {
+    bool isSubmitting;
+    
+    async Task setAuthor()
+    {
+        isSubmitting = true;
+        //simulate async api call
+        await Task.Delay(3000);
+        isSubmitting = false;
+    }
+
+
+    //void setAuthor()
+    //{
+    //    isSubmitting = true;
+    //    Task.Delay(2000).ContinueWith((t) =>
+    //    {            
+    //        isSubmitting = false;
+    //    });
+
+    //    //var task = Task.Run(() => State.Author = "Gosho");
+    //    //if (task.Wait(TimeSpan.FromSeconds(3)))
+    //    //    return task.Result;
+    //    //else
+    //    //    throw new Exception("Timed out");
+    //}
+}
