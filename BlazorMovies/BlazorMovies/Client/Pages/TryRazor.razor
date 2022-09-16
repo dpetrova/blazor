@@ -1,0 +1,104 @@
+﻿@page "/try"
+@*include locally to this file*@
+@*@using BlazorMovies.Client.Helpers;*@
+
+@*for include globally to every Razor file in Client project place using statement in /Shared/_Imports.razor*@
+
+<PageTitle>Try Razor</PageTitle>
+
+<h1>Hello, @StringUtilities.CustomToUpper(name)</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<p>Sum of 2 + 2 = @(2 + 2)</p>
+
+<p>Cat say: @Cat.Speak()</p>
+
+<button @onclick="@(() => Console.WriteLine("The button was clicked!"))">Click Me!</button>
+
+<br />
+<div>
+    <h3>Movie</h3>
+    <p>Title: @lotr.Title</p>
+    <p>Release: @lotr.ReleaseDate.ToString("dd MMM yyy")</p>
+</div>
+
+@*conditionals*@
+@if (movies == null)
+{
+    <text>Loading...</text>
+}
+else
+{
+    @*loops*@
+    <div>
+        <h3>Movies</h3>
+        @foreach (var movie in movies)
+        {
+            <p>Title: @movie.Title</p>
+            <p>Release: @movie.ReleaseDate.ToString("dd MMM yyy")</p>
+        }
+
+        <br />
+        <h3>Movies</h3>
+        @for (var i = 0; i < movies.Count; i++)
+        {
+            @*conditional style*@
+            <div style="background-color: @(i % 2 == 0 ? "grey" : "lightgrey")">
+                <p>@(i + 1). Title: @movies[i].Title</p>
+                <p>Release: @movies[i].ReleaseDate.ToString("dd MMM yyy")</p>
+            </div>
+        }
+    </div>
+}
+
+@*direct render html*@
+<div>@((MarkupString)someHtml)</div>
+
+@code {
+    string name = "Danny";
+    List<Movie> movies;
+
+    public class Cat
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string Breed { get; set; }
+        public static string Speak() => "Miauuuuuuuuu";
+    }
+
+    Movie lotr = new Movie()
+        {
+            Title = "LOTR: Fellowship of the rings",
+            ReleaseDate = new DateTime(2002, 12, 25)
+        };
+
+    //lifehook invoked when component is ready to start (loads)
+    //protected override void OnInitialized()
+    //{
+    //    movies = new List<Movie>()
+    //    {
+    //        new Movie(){Title = "LOTR: Fellowship of the rings", ReleaseDate = new DateTime(2002, 03, 22)},
+    //        new Movie(){Title = "LOTR: Two towers", ReleaseDate = new DateTime(2003, 01, 10)},
+    //        new Movie(){Title = "LOTR: Return of the king", ReleaseDate = new DateTime(2004, 01, 10)},
+    //    };
+    //    base.OnInitialized();
+    //}
+
+    //async variant of lifehook invoked when component is ready to start (loads)
+    protected async override Task OnInitializedAsync()
+    {
+        await Task.Delay(5000);
+        movies = new List<Movie>()
+        {
+            new Movie(){Title = "Star Wars: A new hope", ReleaseDate = new DateTime(1977, 05, 25)},
+            new Movie(){Title = "Star Wars: Empire strikes back", ReleaseDate = new DateTime(1980, 05, 21)},
+            new Movie(){Title = "Star Wars: Return of the jedi", ReleaseDate = new DateTime(1983, 05, 25)},
+        };
+
+    }
+
+    string someHtml = "<div>My name is: <b>Danny</b></div>";
+}
