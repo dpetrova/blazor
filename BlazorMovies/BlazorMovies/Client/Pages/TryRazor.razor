@@ -4,6 +4,11 @@
 
 @*for include globally to every Razor file in Client project place using statement in /Shared/_Imports.razor*@
 
+@*dependency injection of configured (in Program.cs) services*@
+@inject SingletonService singletonService;
+@inject TransientService transientService;
+
+
 <PageTitle>Try Razor</PageTitle>
 
 <h1>Hello, @StringUtilities.CustomToUpper(name)</h1>
@@ -16,7 +21,14 @@ Welcome to your new app.
 
 <p>Cat say: @Cat.Speak()</p>
 
+@*using event*@
 <button @onclick="@(() => Console.WriteLine("The button was clicked!"))">Click Me!</button>
+
+@*data binding*@
+<p>Current count: @currentCount</p>
+<input type="number" @bind="currentCount" />
+@*eqivalent of:*@
+<button @onclick="@(() => currentCount++)">Increment count</button>
 
 <br />
 <div>
@@ -54,12 +66,31 @@ else
     </div>
 }
 
+@*try configured services*@
+<button @onclick="IncrementServiceValue">Increment Service Value</button>
+<p>Sigleton service value (it will be retained during navigation between routes and will be the same in all components): @singletonService.Value</p>
+<p>Transient service value (it will be reset to 0 during navigation between routes): @transientService.Value</p>
+
+
 @*direct render html*@
 <div>@((MarkupString)someHtml)</div>
+
+@*default render fragment (works if only one reder fragment is used)*@
+<TryDefaultRenderFragment>
+    <span style="color: blue">Default RenderFragment as ChildContent</span>
+</TryDefaultRenderFragment>
+
+@*if there are more render fragments, use named render fragments*@
+<TryNamedRenderFragment>
+    <Hello><span>Hello, this is Hello RenderFragment</span></Hello>
+    <Notify><span>This is Notify RenderFragment</span></Notify>
+</TryNamedRenderFragment>
+        
 
 @code {
     string name = "Danny";
     List<Movie> movies;
+    private int currentCount = 0;
 
     public class Cat
     {
@@ -101,4 +132,44 @@ else
     }
 
     string someHtml = "<div>My name is: <b>Danny</b></div>";
+
+    private void IncrementServiceValue() {
+        singletonService.Value++;
+        transientService.Value++;
+    }
+
+
+    /* using lifecycle methods */
+
+    // used to initialize the component;
+    // executed only once;
+    // ideal stage for http reguests to fetching data to be displayed
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("OnInitialized.");
+    }
+
+    // executed when component recieved all parameters and their values are assigned to respective properties;
+    // executed every time the parameters are updated
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine("OnParametersSet.");
+    }
+
+    // executed when component finish rendering (html is already displayed);
+    // executed every time the component is rerendered
+    // ideal stage to perform manipulations on html elements
+    protected override void OnAfterRender(bool firsRender)
+    {
+        Console.WriteLine($"OnAfterRender. FirstRender={firsRender.ToString()}");
+    }
+
+    // use this method to indicate if we want to rerender a component after its initial rendering
+    // ideal when have extensive operations on the component and temporary disable rerendering, and after finish operations enable rerendering again
+    protected override bool ShouldRender()
+    {
+        return true;
+    }
+
+    
 }

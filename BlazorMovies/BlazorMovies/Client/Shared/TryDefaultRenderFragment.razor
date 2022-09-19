@@ -1,0 +1,10 @@
+﻿@*render passed content as render fragment*@
+<div style="background-color: lightgray"
+     @ChildContent
+</div>
+
+@code {
+    // if you want to render some content use special name ChildContent and render fragment
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

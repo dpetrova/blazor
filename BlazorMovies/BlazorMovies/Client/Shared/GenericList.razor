@@ -1,0 +1,67 @@
+﻿@*making a component generic (to handle several data types)*@
+@typeparam TItem
+
+<div>
+    @if (List == null)
+    {        
+        @if (LoadingTemplate != null)
+        {
+            @LoadingTemplate
+        }
+        else
+        {
+            @*default loading gif*@
+            <img src="https://media1.giphy.com/media/3oEjI6SIIHBdRxXI40/200.gif" />
+        }
+
+    }
+    else if (List.Count == 0)
+    {
+        @if (NullTemplate != null)
+        {
+            @NullTemplate
+        }
+        else
+        {
+            @*default empty text*@
+            <text>There are no records to show</text>
+        }
+    }
+    else
+    {
+        <div>
+           
+
+            @*Loop over list*@
+            @foreach (var item in List)
+            {
+                @ItemTemplate(item)
+            }
+
+            @*Loop over tuples with the item and its index*@
+            @*
+            @foreach (var item in List.Select((value, index) => (value, index)))
+            {
+                <div style="background-color: @(item.index % 2 == 0 ? "grey" : "lightgrey")">
+                    @ItemTemplate(item.value)
+                </div>
+            }
+            *@
+        </div>
+    }
+</div>
+
+@code {
+    //data recieved from parent
+    [Parameter]
+    public List<TItem> List { get; set; }
+
+    //content to be rendered
+    [Parameter]
+    public RenderFragment NullTemplate { get; set; }
+    [Parameter]
+    public RenderFragment LoadingTemplate { get; set; }
+    [Parameter]
+    public RenderFragment<TItem> ItemTemplate { get; set; }
+
+}

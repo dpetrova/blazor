@@ -1,31 +1,18 @@
 ﻿@page "/"
 
+@*dependency injection of configured (in Program.cs) service*@
+@inject IRepository repository;
+
+
 <PageTitle>Index</PageTitle>
 
 <div>
     <h3>Movies</h3>
-    @if (movies == null)
-    {
-        <text>Loading...</text>
-    }
-    else if (movies.Count == 0)
-    {
-        <text>There are no records to show</text>
-    }
-    else
-    {
-        <div>
-            @*Loop over tuples with the item and its index*@
-            @foreach (var item in movies.Select((value, i) => (value, i)))
-            {
-                <div style="background-color: @(item.i % 2 == 0 ? "grey" : "lightgrey")">
-                    <p>@(item.i + 1). Title: @item.value.Title</p>
-                    <p>Release: @item.value.ReleaseDate.ToString("dd MMM yyy")</p>
-                </div>
-            }
-        </div>
-    }
+    <MoviesList Movies="movies" />
 </div>
+
+<button @onclick="AddMovie">Add new movie</button>
+
 
 @code {
     List<Movie> movies;
@@ -33,12 +20,14 @@
     protected async override Task OnInitializedAsync()
     {
         await Task.Delay(3000);
-        movies = new List<Movie>()
-        {
-            new Movie(){Title = "Star Wars: A new hope", ReleaseDate = new DateTime(1977, 05, 25)},
-            new Movie(){Title = "Star Wars: Empire strikes back", ReleaseDate = new DateTime(1980, 05, 21)},
-            new Movie(){Title = "Star Wars: Return of the jedi", ReleaseDate = new DateTime(1983, 05, 25)},
-        };
+
+        //delegate obtaining the movies to a service
+        movies = repository.GetMovies();
+    }
+
+    private void AddMovie()
+    {
+        this.movies.Add(new Movie() { Title = "Star Wars: The Phantom Menace", ReleaseDate = new DateTime(1999, 05, 19) });
     }
 
 }
