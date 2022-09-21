@@ -1,0 +1,18 @@
+﻿@page "/counter-partial-class"
+
+<PageTitle>Counter Partial Class</PageTitle>
+
+<h3>TryPartialClass</h3>
+
+<p role="status">Current count: @currentCount</p>
+<p>Sigleton service value (it will be retained during navigation between routes and will be the same in all components): @singletonService.Value</p>
+<p>Transient service value (it will be reset to 0 during navigation between routes): @transientService.Value</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<input type="number" @bind="currentCount" />
+
+
+@code {
+
+}

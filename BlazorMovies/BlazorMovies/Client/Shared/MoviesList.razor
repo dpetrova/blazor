@@ -1,5 +1,7 @@
-﻿@* allowed/or not to manipulate movies*@
+﻿@*inject service for invoking JS functions*@
+@inject IJSRuntime js;
 
+@*checbox for allowing/or not to manipulate movies*@
 @*using data binding:*@
 <label for="allowedToManipulate">Allowed to manipulate (using data binding)</label>
 <input type="checkbox" @bind="allowedToManipulate" />
@@ -35,10 +37,21 @@
     [Parameter]
     public List<Movie> Movies { get; set; }
 
-    bool allowedToManipulate = false;
+    bool allowedToManipulate = true;
 
-    private void Delete(Movie movie)
+    private async Task Delete(Movie movie)
     {
-        Movies.Remove(movie);
-    }    
+        // var confirmed = await js.InvokeAsync<bool>("confirm", $"Are you sure to delete {movie.Title}");
+
+        //use function from created extension method
+        var confirmed = await js.Confirm($"Are you sure to delete {movie.Title}");        
+
+        if (confirmed)
+        {
+            Movies.Remove(movie);
+        }
+
+        js.Log($"The movie {movie.Title} is deleted!");
+        await js.LogFromCustomJsFunction("This is log from custom created JS function");
+    }
 }

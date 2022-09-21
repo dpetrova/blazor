@@ -7,6 +7,7 @@
 @*dependency injection of configured (in Program.cs) services*@
 @inject SingletonService singletonService;
 @inject TransientService transientService;
+@inject IJSRuntime js;
 
 
 <PageTitle>Try Razor</PageTitle>
@@ -70,6 +71,11 @@ else
 <button @onclick="IncrementServiceValue">Increment Service Value</button>
 <p>Sigleton service value (it will be retained during navigation between routes and will be the same in all components): @singletonService.Value</p>
 <p>Transient service value (it will be reset to 0 during navigation between routes): @transientService.Value</p>
+
+@*invoke custom js function*@
+<button @onclick="CallStaticCSharpMethodFromJS">Call CSharp Static Method From JS</button>
+<br>
+<button @onclick="CallInstanceCSharpMethodFromJS">Call CSharp Instance Method From JS</button>
 
 
 @*direct render html*@
@@ -171,5 +177,32 @@ else
         return true;
     }
 
+    // use these for call C# static method from JS
+    private static int staticCounter = 111;
+    [JSInvokable]
+    public static Task<int> GetStaticCounter() 
+    {
+        return Task.FromResult(staticCounter);
+    }
+    private async Task CallStaticCSharpMethodFromJS() 
+    {
+        await js.InvokeVoidAsync("dotnetStaticInvokation");
+    }
+
+    // use these for call C# instance method from JS
+    private int instanceCounter = 222;
+    [JSInvokable]
+    public void GetInstanceCounter(){
+        Console.WriteLine($"counter of invoked C# instance method into JS function is: {instanceCounter}");
+    }
+    private async Task CallInstanceCSharpMethodFromJS()
+    {
+        // params: 1-> JS function name; 2-> reference to the class' object which member is the method invoked in JS (here it is this instance)
+        await js.InvokeVoidAsync("dotnetInstanceInvocation", DotNetObjectReference.Create(this));
+
+        //e.g if we want to pass movie reference
+        //var movie = new Movie();
+        //await js.InvokeVoidAsync("dotnetInstanceInvocation", DotNetObjectReference.Create(movie));
+    }
     
 }
