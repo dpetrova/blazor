@@ -1,0 +1,104 @@
+﻿@page "/"
+@using RockPaperScissors.Helpers
+@using System.Timers
+
+@*implement IDisposable interface so to be able to dispose used resources*@
+@implements IDisposable
+
+<PageTitle>Index</PageTitle>
+
+<h1>Rock, paper, and Scissors</h1>
+
+@if(!@String.IsNullOrEmpty(resultMessage))
+{
+    <h3 style="color: @resultMessageColor">@resultMessage</h3>
+}
+
+<button class="btn btn-info" @onclick="PlayAgain">Play Again</button>
+
+<div style="display: flex; justify-content: center; margin-bottom: 20px;">
+    <img src="/images/@opponentHand.Image" class="image"/>
+</div>
+
+<div style="display: flex; justify-content: center; ">
+    @foreach(var hand in hands)
+    {
+        <img src="images/@hand.Image" class="image selectable-image" @onclick="@(() => SelectHand(hand))"/>        
+    }
+</div>
+
+@code {
+    // possible hands combinations
+    List<Hand> hands = new List<Hand>()
+    {
+        new Hand(){Selection = OptionRPS.Paper, LosesAgainst = OptionRPS.Scissors, WinsAgainst= OptionRPS.Rock, Image= "paper.png"},
+        new Hand(){Selection = OptionRPS.Rock, LosesAgainst = OptionRPS.Paper, WinsAgainst= OptionRPS.Scissors, Image= "rock.png"},
+        new Hand(){Selection = OptionRPS.Scissors, LosesAgainst = OptionRPS.Rock, WinsAgainst= OptionRPS.Paper, Image= "scissors.png"}
+    };
+
+    Timer timer;
+    Hand opponentHand;
+    int indexOpponentHand = 0;
+    string resultMessage = String.Empty;
+    string resultMessageColor = "black";
+
+    // create a timer to execute a method every 100ms at intervals
+    // use lifecycle when component is created 
+    protected override void OnInitialized()
+    {
+        opponentHand = hands[indexOpponentHand];
+        timer = new Timer(); // initialize timer
+        timer.Interval = 100; // repeat every 100ms
+        timer.Elapsed += TimerOnElapsed; //method to execute
+        timer.Start(); //start timer
+    }
+
+    // method to execute in an interval
+    private void TimerOnElapsed(object sender, ElapsedEventArgs args)
+    {
+        //change opponent hand selection
+        indexOpponentHand = (indexOpponentHand + 1) % hands.Count; // value will be 0 or 1 or 2
+        opponentHand = hands[indexOpponentHand];
+
+        //let Blazor to know that a change has occured and needs to update/rerender a component
+        StateHasChanged();
+    }
+
+    //stop the timer
+    private void SelectHand(Hand hand)
+    {
+        timer.Stop();
+        var result = hand.PlayAgainst(opponentHand);
+
+        if(result == GameStatus.Victory)
+        {
+            resultMessage = "YOU WIN!";
+            resultMessageColor = "green";
+        }
+        else if(result == GameStatus.Loss)
+        {
+            resultMessage = "YOU LOST!";
+            resultMessageColor = "red";
+        }
+        else 
+        {
+            resultMessage = "DRAW AGAIN!";
+            resultMessageColor = "black";
+        }
+    }
+
+    private void PlayAgain()
+    {
+        resultMessage = String.Empty;
+        timer.Start();
+    }
+
+    // dispose used resources
+    public void Dispose()
+    {
+        if(timer != null)
+        {
+            timer.Dispose();
+        }
+    }
+}
