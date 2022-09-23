@@ -1,11 +1,16 @@
-﻿<div>
-    <p>Title: @Movie.Title</p>
+﻿<div class="individual-movie-container">
+    <a>
+        <img src="@Movie.Poster" alt="Poster" class="movie-poster"/>
+    </a>
+    <p>@Movie.Title</p>
     <p>Release: @Movie.ReleaseDate.ToString("dd MMM yyy")</p>
-
-    @if (DisplayButtons)
-    {
-        <button onclick="@(() => DeleteMovie.InvokeAsync(Movie))">Delete</button>
-    }
+    <div>
+        <a class="btn btn-info">Edit</a>
+        @if (DisplayButtons)
+        {
+            <button type="button" class="btn btn-danger" onclick="@(() => DeleteMovie.InvokeAsync(Movie))">Delete</button>
+        }
+    </div>    
 </div>
 
 @code {

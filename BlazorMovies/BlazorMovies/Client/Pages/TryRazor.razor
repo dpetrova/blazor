@@ -1,8 +1,11 @@
 ﻿@page "/try"
+
 @*include locally to this file*@
 @*@using BlazorMovies.Client.Helpers;*@
 
 @*for include globally to every Razor file in Client project place using statement in /Shared/_Imports.razor*@
+
+@using static BlazorMovies.Client.Shared.MainLayout;
 
 @*dependency injection of configured (in Program.cs) services*@
 @inject SingletonService singletonService;
@@ -31,9 +34,27 @@ Welcome to your new app.
 @*eqivalent of:*@
 <button @onclick="@(() => currentCount++)">Increment count</button>
 
+@*bind passed cascading parameters*@
+<div style="display:flex">
+    <div style="width: 150px">
+        <select @bind="AppState.Color" class="form-control" style="margin-top: 15px;">
+            <option value="red">red</option>
+            <option value="blue">blue</option>
+            <option value="green">green</option>
+        </select>
+    </div>
+    <div style="width: 150px">
+        <select @bind="AppState.Size" class="form-control" style="margin-top: 15px;">
+            <option value="12px">12px</option>
+            <option value="20px">20px</option>
+            <option value="30px">30px</option>
+        </select>
+    </div>
+</div>
+
 <br />
 <div>
-    <h3>Movie</h3>
+    <h3 style="color: @AppState.Color; font-size:@AppState.Size">Movie</h3>
     <p>Title: @lotr.Title</p>
     <p>Release: @lotr.ReleaseDate.ToString("dd MMM yyy")</p>
 </div>
@@ -73,6 +94,8 @@ else
 <p>Transient service value (it will be reset to 0 during navigation between routes): @transientService.Value</p>
 
 @*invoke custom js function*@
+<button @onclick="CallJsFunction">Call Custom JS function</button>
+<br>
 <button @onclick="CallStaticCSharpMethodFromJS">Call CSharp Static Method From JS</button>
 <br>
 <button @onclick="CallInstanceCSharpMethodFromJS">Call CSharp Instance Method From JS</button>
@@ -91,12 +114,32 @@ else
     <Hello><span>Hello, this is Hello RenderFragment</span></Hello>
     <Notify><span>This is Notify RenderFragment</span></Notify>
 </TryNamedRenderFragment>
+
+<button @onclick="@(() => confirmation.Show())">Open dialog</button>
+<Confirmation @ref="confirmation" onCancel="Cancel" onConfirm="Confirm">
+    <div>Hello, what do you want to do?</div>
+</Confirmation>
         
 
 @code {
     string name = "Danny";
     List<Movie> movies;
     private int currentCount = 0;
+
+    //retrive the value of the cascading parameter (define in the MainLayout)
+    //[CascadingParameter]
+    //public string Color { get; set; }
+
+    //retrive multiple cascading parameters (define in the MainLayout)
+    [CascadingParameter(Name = "Color")]
+    public string Color { get; set; }
+    [CascadingParameter(Name = "Size")]
+    public string Size { get; set; }
+
+    //retrive the multiple values of the cascading parameter passed as a class instance (define in the MainLayout)
+    [CascadingParameter]
+    public AppState AppState { get; set; }
+
 
     public class Cat
     {
@@ -177,6 +220,21 @@ else
         return true;
     }
 
+    //use this for call JS from C# code
+    private async Task CallJsFunction()
+    {
+        // var confirmed = await js.InvokeAsync<bool>("confirm", $"Are you sure to delete {movie.Title}");
+
+        //use function from created extension method
+        var confirmed = await js.Confirm("Are you sure to call a custom extension IJSRuntime method?");
+
+        if (confirmed)
+        {
+            //use created custom js fuction
+            await js.LogFromCustomJsFunction("This is log from custom created JS function");
+        }
+    }    
+
     // use these for call C# static method from JS
     private static int staticCounter = 111;
     [JSInvokable]
@@ -203,6 +261,20 @@ else
         //e.g if we want to pass movie reference
         //var movie = new Movie();
         //await js.InvokeVoidAsync("dotnetInstanceInvocation", DotNetObjectReference.Create(movie));
-    }
+    }   
     
+    //create a reference to Confirmation dialog
+    Confirmation confirmation;
+
+    private void Confirm()
+    {
+        js.Log("Dialog is confirmed");
+        confirmation.Hide();        
+    }
+
+    private void Cancel()
+    {
+        js.Log("Dialog is canceled");
+        confirmation.Hide();
+    }
 }

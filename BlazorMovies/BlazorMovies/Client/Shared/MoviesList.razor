@@ -32,26 +32,40 @@
     </ItemTemplate>
 </GenericList>
 
+<Confirmation @ref="confirmation" onCancel="CancelDelete" onConfirm="ConfirmDelete">
+    <div>Are you sure to delete @targetMovie.Title ?</div>
+</Confirmation>
+
 @code {
     //data recieved from parent
     [Parameter]
     public List<Movie> Movies { get; set; }
 
-    bool allowedToManipulate = true;
+    private bool allowedToManipulate = true;
 
-    private async Task Delete(Movie movie)
+    private Movie targetMovie;
+
+    private void Delete(Movie movie)
     {
-        // var confirmed = await js.InvokeAsync<bool>("confirm", $"Are you sure to delete {movie.Title}");
+        targetMovie = movie;
+        confirmation.Show();        
+    }
 
-        //use function from created extension method
-        var confirmed = await js.Confirm($"Are you sure to delete {movie.Title}");        
+    //create a reference to Confirmation dialog
+    Confirmation confirmation;    
 
-        if (confirmed)
-        {
-            Movies.Remove(movie);
-        }
+    private void ConfirmDelete()
+    {
+        Movies.Remove(targetMovie);
+        confirmation.Hide();
+        targetMovie = null;
+        //js.Log($"The movie {targetMovie.Title} is deleted!");
+        //await js.LogFromCustomJsFunction($"The movie {targetMovie.Title} is deleted!");
+    }
 
-        js.Log($"The movie {movie.Title} is deleted!");
-        await js.LogFromCustomJsFunction("This is log from custom created JS function");
+    private void CancelDelete()
+    {
+        confirmation.Hide();
+        targetMovie = null;
     }
 }

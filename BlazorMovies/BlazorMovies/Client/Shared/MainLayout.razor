@@ -11,7 +11,35 @@
         </div>
 
         <article class="content px-4">
+            @*using cascading values to propagate parameters to all children of this component *@
+            @*the Color value will be accessible through whole application*@
+            @*<CascadingValue Value="@Color">
             @Body
+            </CascadingValue>*@
+
+            @*pass multiple cascading parameters*@
+            @*<CascadingValue Value="@Color" Name="Color">
+                <CascadingValue Value="@Size" Name="Size">
+                @Body
+                </CascadingValue>
+            </CascadingValue>*@
+
+            @*pass multiple values in one cascading parameter: use class object*@
+            <CascadingValue Value="@appState">
+                @Body
+            </CascadingValue>
         </article>
     </main>
 </div>
+
+@code {
+    private string Color = "red";
+    private string Size = "18px";
+
+    public class AppState {
+        public string Color { get; set; } = "red";
+        public string Size { get; set; }  = "18px";
+    }
+
+    AppState appState = new AppState();
+}
