@@ -1,12 +1,20 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿@*configure routing logic:
+    AppAssembly="@typeof(App).Assembly" -> look for pages in this assembly
+    PreferExactMatches -> exact match of url
+    DefaultLayout="@typeof(MainLayout)" -> specify default layout
+*@
+<Router AppAssembly="@typeof(App).Assembly" PreferExactMatches="@true">
+    @*show this when route match url*@
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
+    @*show this when route does not match url*@
     <NotFound>
         <PageTitle>Not found</PageTitle>
         <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
+            @*show custom 4040 not found page component*@
+            <NotFound />
         </LayoutView>
     </NotFound>
 </Router>

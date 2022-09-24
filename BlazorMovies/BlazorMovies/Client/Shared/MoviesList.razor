@@ -11,26 +11,28 @@
 <label for="allowedToManipulate">Allowed to manipulate (using onchange event)</label>
 <input type="checkbox" @onchange="@(() => allowedToManipulate = !allowedToManipulate)" />
 
-@*render list of movies*@
-<GenericList List="Movies">
-    @*pass content to be rendered in the component*@
-    @*<span style="color: blue">Here we will display movies...</span>*@
+<div class="movies-container">
+    @*render list of movies*@
+    <GenericList List="Movies">
+        @*pass content to be rendered in the component*@
+        @*<span style="color: blue">Here we will display movies...</span>*@
 
-    @*when have more than one content to pass use named tags:*@
-    <LoadingTemplate>
-        <span style="color: blue">Loading...</span>
-    </LoadingTemplate>
-    <NullTemplate>
-        <span style="color: red">No records to display</span>
-    </NullTemplate>
-    <ItemTemplate Context="movie">
-        @*use default context to access passed variable to generic render fragment*@
-        @*<IndividualMovie Movie="context" DisplayButtons="allowedToManipulate" DeleteMovie="Delete" />*@
+        @*when have more than one content to pass use named tags:*@
+        <LoadingTemplate>
+            <span style="color: blue">Loading...</span>
+        </LoadingTemplate>
+        <NullTemplate>
+            <span style="color: red">No records to display</span>
+        </NullTemplate>
+        <ItemTemplate Context="movie">
+            @*use default context to access passed variable to generic render fragment*@
+            @*<IndividualMovie Movie="context" DisplayButtons="allowedToManipulate" DeleteMovie="Delete" />*@
 
-        @*access passed variable to generic render fragment as it set in Context*@
-        <IndividualMovie Movie="movie" DisplayButtons="allowedToManipulate" DeleteMovie="Delete" />
-    </ItemTemplate>
-</GenericList>
+            @*access passed variable to generic render fragment as it set in Context*@
+            <IndividualMovie Movie="movie" DisplayButtons="allowedToManipulate" DeleteMovie="Delete" />
+        </ItemTemplate>
+    </GenericList>
+</div>
 
 <Confirmation @ref="confirmation" onCancel="CancelDelete" onConfirm="ConfirmDelete">
     <div>Are you sure to delete @targetMovie.Title ?</div>

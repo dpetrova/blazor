@@ -1,0 +1,18 @@
+﻿@*declare route parameters MovieId if type int and MovieName of type string, as we don't have to use parameter restrictions (:string) for string types*@
+@page "/movie/{MovieId:int}"
+@page "/movie/{MovieId:int}/{MovieName}"
+
+<h3>MovieDetails</h3>
+
+@code {
+    [Parameter]
+    public int MovieId { get; set; }
+    [Parameter]
+    public string MovieName { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine(MovieId);
+        Console.WriteLine(MovieName);
+    }
+}

@@ -1,8 +1,10 @@
 ﻿<div class="individual-movie-container">
-    <a>
-        <img src="@Movie.Poster" alt="Poster" class="movie-poster"/>
+    <a href="@movieURL">
+        <img src="@Movie.Poster" alt="Poster" class="movie-poster" />
     </a>
-    <p>@Movie.Title</p>
+    <p>
+        <a href="@movieURL">@Movie.TitleBrief</a>
+    </p>
     <p>Release: @Movie.ReleaseDate.ToString("dd MMM yyy")</p>
     <div>
         <a class="btn btn-info">Edit</a>
@@ -10,7 +12,7 @@
         {
             <button type="button" class="btn btn-danger" onclick="@(() => DeleteMovie.InvokeAsync(Movie))">Delete</button>
         }
-    </div>    
+    </div>
 </div>
 
 @code {
@@ -20,7 +22,15 @@
     [Parameter]
     public bool DisplayButtons { get; set; } = false; //set default value to false
 
-    //event callbacks (delegate functionality to the parent)   
+    //event callbacks (delegate functionality to the parent)
     [Parameter]
     public EventCallback<Movie> DeleteMovie { get; set; }
+
+    private string movieURL = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        movieURL = $"/movie/{Movie.Id}/{Movie.Title.Replace(" ", "-")}";
+    }
+
 }

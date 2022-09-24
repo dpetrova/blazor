@@ -1,0 +1,21 @@
+﻿@page "/movies/create"
+
+@*NavigationManager service is used to programatically navigate user to another pages of the application*@
+@inject NavigationManager navigationManager
+
+<h3>Create Movie</h3>
+
+<button @onclick="SaveMovie" style="btn btn-primary">Save Movie</button>
+
+@code {
+    private void SaveMovie()
+    {
+        //saving movie...
+
+        //current URL at which the user is
+        Console.WriteLine(navigationManager.Uri);
+        //redirect user to /movie
+        navigationManager.NavigateTo("movie");
+    }
+    
+}

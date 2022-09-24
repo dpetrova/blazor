@@ -1,4 +1,9 @@
-﻿.individual-movie-container {
+﻿.movies-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.individual-movie-container {
     margin-right: 2%;
     margin-bottom: 10px;
     text-align: center;
