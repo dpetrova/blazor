@@ -1,0 +1,184 @@
+﻿@using System.Timers
+
+@*to handle different types*@
+@typeparam TItem
+
+<div class="blazored-typeahead">
+    @*text box*@
+    <div class="blazored-typeahead__controls">
+        <input type="text"
+               class="blazored-typeahead__input"
+               autocomplete="off"
+               placeholder="@Placeholder"
+               @bind-value="@SearchText"
+               @bind-value:event="oninput"
+               @onclick="@ShowSuggestions"
+               @onfocusout="onfocusout" />
+    </div>
+
+    @*loading indicator*@
+    @if (isSearching)
+    {
+        <div class="blazored-typeahead__results">
+            <div class="blazored-typeahead__results">
+                <span>Loading...</span>
+            </div>
+        </div>
+    }
+    @*show suggestions if any*@
+    else if (ShouldShowSuggestions())
+    {
+        <div class="blazored-typeahead__results">
+            @foreach (var item in Suggestions)
+            {
+                <div @key="item"
+                    @onclick="@(() => SelectSuggestion(item))"
+                    @onmouseover="OnMouseoverSuggestion"
+                    @onmouseout="OnMouseoutSuggestion"
+                    class="blazored-typeahead__results" tabindex="0"
+                >
+                        @ResultTemplate(item)
+                </div>
+            }
+        </div>
+    }
+    @*not results found*@
+    else if (ShowNotFound())
+    {
+        <div class="blazored-typeahead__results">
+            @if (NotFoundTemplate != null)
+            {
+                <div class="blazored-typeahead__notfound">
+                    @NotFoundTemplate
+                </div>
+            }
+            else
+            {
+                <div class="blazored-typeahead__notfound">
+                    No Results Found
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+
+@code {
+    [Parameter]
+    public string Placeholder { get; set; }
+
+    [Parameter]
+    public int MinimumLength { get; set; } = 3; //min length of searhing text
+
+    [Parameter]
+    public int Debounce { get; set; } = 300; //searching debounce time in ms
+
+    [Parameter]
+    public Func<string, Task<IEnumerable<TItem>>> SearchMethod { get; set; } //event callback that recieve string and return Task with IEnumerable(e.g. List) of different types
+
+    protected TItem[] Suggestions { get; set; } = new TItem[0];
+
+    [Parameter]
+    public RenderFragment<TItem> ResultTemplate { get; set; }
+
+    [Parameter]
+    public RenderFragment NotFoundTemplate { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> ValueChanged { get; set; }
+
+
+    private bool isSearching = false;
+    private bool isShowingSuggestions = false;
+    private string _searchText = string.Empty;
+    private Timer _debounceTimer;
+    private bool isMouseInSuggestion = false;
+
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            _searchText = value;
+            if (value.Length == 0)
+            {
+                isShowingSuggestions = false;
+                _debounceTimer.Stop();
+                Suggestions = new TItem[0];
+            }
+            else if (value.Length >= MinimumLength)
+            {
+                _debounceTimer.Stop();
+                _debounceTimer.Start();
+                //fire the method to search items in DB
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        _debounceTimer = new Timer();
+        _debounceTimer.Interval = Debounce;
+        _debounceTimer.AutoReset = false;
+        _debounceTimer.Elapsed += Search;
+        base.OnInitialized();
+    }
+
+    protected async void Search(Object source, ElapsedEventArgs e)
+    {
+        isSearching = true;
+        isShowingSuggestions = false;
+        await InvokeAsync(StateHasChanged);
+
+        //call DB method to get results
+        Suggestions = (await SearchMethod.Invoke(_searchText)).ToArray();
+
+        isSearching = false;
+        isShowingSuggestions = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void ShowSuggestions()
+    {
+        if (Suggestions.Any())
+        {
+            isShowingSuggestions = true;
+        }
+    }
+
+    private bool ShowNotFound()
+    {
+        return !Suggestions.Any() && isShowingSuggestions;
+    }
+
+    private bool ShouldShowSuggestions()
+    {
+        return isShowingSuggestions && Suggestions.Any();
+    }
+
+    private async Task SelectSuggestion(TItem item)
+    {
+        SearchText = "";
+        await ValueChanged.InvokeAsync(item);
+    }
+
+    //collapse the suggestion when user click outside the textbox
+    private void onfocusout()
+    {
+        if(!isMouseInSuggestion)
+        {
+            isShowingSuggestions = false;
+        }        
+    }
+
+    private void OnMouseoverSuggestion()
+    {
+        isMouseInSuggestion = true;
+    }
+
+    private void OnMouseoutSuggestion()
+    {
+        isMouseInSuggestion = false;
+    }
+}

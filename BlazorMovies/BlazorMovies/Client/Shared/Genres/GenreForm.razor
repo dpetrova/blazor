@@ -1,0 +1,30 @@
+﻿@*
+EditForm is a component for making a form based on a model;
+pass Model parameter which is an instance object of the entity;
+pass OnSubmit / OnValidSubmit (run only if every single validation rule is fulfilled) /OnInvalidSubmit event callback which will be invoked when the form is submitted;
+use special components InputText, InputFile, Inputselect, InputDate, InputCheckbox, InputRadio... as form fields;
+*@
+<EditForm Model="Genre" OnValidSubmit="Submit">
+    @*we need to use DataAnnotationsValidator component when we are going to use attrubute validations*@
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label>Name:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@Genre.Name" />
+            @*validation error message*@
+            <ValidationMessage For="@(() => Genre.Name)" />
+        </div>
+    </div>
+
+    <button class="btn btn-success" type="submit">Save Changes</button>
+    
+</EditForm>
+
+@code {
+    [Parameter]
+    public Genre Genre { get; set; }
+
+    [Parameter]
+    public EventCallback Submit { get; set; }
+}

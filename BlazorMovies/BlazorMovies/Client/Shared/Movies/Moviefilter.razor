@@ -1,0 +1,87 @@
+﻿@page "/movies/search"
+
+@*dependency injection of configured (in Program.cs) service*@
+@inject IRepository repository;
+
+
+<h3>Search Movie</h3>
+
+<div class="d-inline-flex">
+    @*text search input*@
+    <div class="form-group mb-2">
+        <label for="title" class="sr-only">Title</label>
+        <input type="text" @bind-value="title" @bind-value:event="oninput" @onkeypress="@((KeyboardEventArgs e) => TitleKeyPress(e))" placeholder="Movie Title" class="form-control" id="title" />
+    </div>
+
+    @*dropdown*@
+    <div class="form-group mx-sm-3 mb-2">
+        <label for="selectedGenre" class="sr-only">Genre</label
+        <select class="form-control" @bind="selectedGenre" id="selectedGenre">
+            <option value="0">-- Select a Genre--</option>
+            @foreach (var genre in genres)
+            {
+                <option value="@genre.Id">@genre.Name</option>
+            }
+        </select>
+    </div>
+
+    @*checkboxes*@
+    <div class="form-group mx-sm-3 mb-2">       
+        <input type="checkbox" @bind="upcomingReleases" class="form-check-input" id="upcomingReleases" />
+         <label for="upcomingReleases" class="form-check-label">Upcoming Releases</label>
+    </div
+    <div class="form-group mx-sm-3 mb-2">        
+        <input type="checkbox" @bind="inTheaters" class="form-check-input" id="inTheaters" />
+        <label for="inTheaters" class="form-check-label">In Theaters</label>
+    </div>
+
+    @*buttons*@
+    <button type="button" @onclick="SearchMovie" class="btn btn-primary mx-sm-3 mb-2">Search</button>
+    <button type="button" @onclick="Clear" class="btn btn-danger mb-2">Clear</button>    
+</div>
+
+@*movies list*@
+ <div>
+     <h3>Movies</h3>
+     <MoviesList Movies="movies" />
+ </div>
+
+@code {
+    private string title = "";
+    private int selectedGenre = 0;
+    private List<Genre> genres = new List<Genre>(){new Genre(){Id=1, Name="Comedy"}, new Genre(){Id=2, Name="Action"}};
+    private bool upcomingReleases = false;
+    private bool inTheaters = false;
+    private List<Movie> movies;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await Task.Delay(3000);
+
+        //delegate obtaining the movies to a service
+        movies = repository.GetMovies();
+    }
+
+    private void TitleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+        //
+        }
+    }
+
+    private void SearchMovie()
+    {
+        movies = movies.Where(x => x.Title.Contains(title)).ToList();
+    }
+
+    private void Clear()
+    {
+        title = "";
+        selectedGenre = 0;
+        upcomingReleases = false;
+        inTheaters = false;
+        movies = repository.GetMovies();
+    }
+
+}

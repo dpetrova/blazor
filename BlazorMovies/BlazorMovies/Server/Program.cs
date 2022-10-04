@@ -1,13 +1,36 @@
+using BlazorMovies.Client.Repository;
+using BlazorMovies.Server;
+using BlazorMovies.Server.Helpers;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+//add configuration providers
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+// allows both to access and to set up the config (in appsettings.json)
+//ConfigurationManager configuration = builder.Configuration; 
+//IWebHostEnvironment environment = builder.Environment;
+
+// REGISTER SERVICES HERE
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddDbContext<ApplicationDbContext>(options => {
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+//for store files in Azure Storage
+//builder.Services.AddScoped<IFileStorageService, AzureStorageService>();
+
+//for store files in local machine
+builder.Services.AddScoped<IFileStorageService, LocalStorageService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+//IConfiguration configuration = app.Configuration;
+//IWebHostEnvironment environment = app.Environment;
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -20,6 +43,8 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+// REGISTER MIDDLEWARE HERE
 
 app.UseHttpsRedirection();
 

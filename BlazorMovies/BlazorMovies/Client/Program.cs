@@ -1,7 +1,9 @@
 using BlazorMovies.Client;
 using BlazorMovies.Client.Helpers;
+using BlazorMovies.Client.Repository;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Tewr.Blazor.FileReader;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -13,5 +15,12 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddSingleton<SingletonService>(); //Singleton: single instance of the service is created
 builder.Services.AddTransient<TransientService>(); //Transient: different instances of the service are created each time that service is requested
 builder.Services.AddTransient<IRepository, RepositoryInMemory>(); //if IRepository is requested, then the DI system will reply with the instance of RepositoryInMemory class
+
+builder.Services.AddScoped<IHttpService, HttpService>();
+builder.Services.AddScoped<IGenreRepository, GenreRepository>();
+builder.Services.AddScoped<IPeopleRepository, PeopleRepository>();
+
+//setup installed Tewr.Blazor.Filereader library
+builder.Services.AddFileReaderService(options => options.InitializeOnFirstCall = true);
 
 await builder.Build().RunAsync();

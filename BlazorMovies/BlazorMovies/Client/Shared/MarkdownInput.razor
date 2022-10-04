@@ -1,0 +1,33 @@
+﻿@*this component will be a cloned of InputTextArea*@
+@inherits InputTextArea
+
+@using System.Linq.Expressions
+
+@*this will be a generic component allows us to handle different data types*@
+@typeparam TValue
+
+<div>
+    <label>@Label</label>
+    <div>
+        @*CurrentValue comes from InputTextArea base class*@
+        <InputTextArea @bind-Value="@CurrentValue" />
+        <ValidationMessage For="@ForLambda" />
+    </div>
+</div>
+
+@*render markdown*@
+<div>
+    <label>@Label (preview):</label>
+    <div class="markdown-container">
+        <MarkdownRender MarkdownContent="@CurrentValue"/>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; }
+
+    //lambda expression to be used in For param
+    [Parameter]
+    public Expression<Func<TValue>> ForLambda { get; set; }
+}

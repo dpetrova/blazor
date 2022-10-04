@@ -1,8 +1,26 @@
-﻿@page "/people/edit/{PersonId}"
+﻿@page "/people/edit/{PersonId:int}"
 
-<h3>EditPerson</h3>
+<h3>Edit Person</h3>
+
+@if (person != null)
+{
+    <PersonForm Person="person" Submit="Edit" />
+}
 
 @code {
     [Parameter]
     public int PersonId { get; set; }
+
+    public Person person;
+
+    protected override void OnInitialized()
+    {
+        //TODO: get person by Id from DB
+        person = new Person() { Id = PersonId, Name = "Harrison Ford", BirthDate = new DateTime(1942, 7, 13), Biography = "Harrison Ford is an American actor." };
+    }
+
+    private void Edit()
+    {
+        Console.WriteLine($"Edit person {person.Name}");
+    }
 }

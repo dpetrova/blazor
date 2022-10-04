@@ -5,9 +5,18 @@
 
 <h3>Create Movie</h3>
 
-<button @onclick="SaveMovie" style="btn btn-primary">Save Movie</button>
+<MovieForm Movie="movie" NotSelectedGenres="genres" Submit="SaveMovie" />
 
 @code {
+    private Movie movie = new Movie();
+
+    private List<Genre> genres = new List<Genre>()
+    {
+        new Genre(){Id=1, Name="Action"},
+        new Genre(){Id=2, Name="Comedy"},
+        new Genre(){Id=3, Name="SciFi"}
+    };
+
     private void SaveMovie()
     {
         //saving movie...
@@ -15,7 +24,7 @@
         //current URL at which the user is
         Console.WriteLine(navigationManager.Uri);
         //redirect user to /movie
-        navigationManager.NavigateTo("movie");
+        navigationManager.NavigateTo("/");
     }
-    
+
 }

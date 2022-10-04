@@ -2,7 +2,36 @@
 
 <h3>Edit Movie</h3>
 
+@if (movie != null)
+{
+    <MovieForm Movie="movie" SelectedGenres="selectedGenres" NotSelectedGenres="notSelectedGenres" Submit="Edit" />
+}
+
 @code {
     [Parameter]
     public int MovieId { get; set; }
+
+    public Movie movie;
+
+    private List<Genre> notSelectedGenres = new List<Genre>()
+    {        
+        new Genre(){Id=2, Name="Comedy"}        
+    };
+
+    private List<Genre> selectedGenres = new List<Genre>()
+    {
+        new Genre(){Id=1, Name="Action"},        
+        new Genre(){Id=3, Name="SciFi"}
+    };
+
+    protected override void OnInitialized()
+    {
+        //TODO: get movie by Id from DB
+        movie = new Movie() { Id = MovieId, Title = "Indiana Jones 5", ReleaseDate = new DateTime(2023, 6, 30), Summary = "Original title: Untitled Indiana Jones Project.", InTheater = false };
+    }
+
+    private void Edit()
+    {
+        Console.WriteLine($"Edit movie {movie.Title}");
+    }
 }

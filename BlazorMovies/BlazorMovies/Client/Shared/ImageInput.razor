@@ -1,0 +1,70 @@
+﻿@using System.IO
+@using Tewr.Blazor.FileReader
+
+@*inject file reader service setup in Program.cs*@
+@inject IFileReaderService fileReaderService
+
+<div>
+    <label>@Label</label>
+    <div>
+        <input type="file" @ref="imageInputRef" @onchange="ImageFileSelected" accept=".jpg,.jpeg,.png" />
+    </div>
+</div>
+
+<div>
+    @*image in base64*@
+    @if (imageBase64 != null)
+    {
+        <div style="margin: 10px;">
+            <img src="data:image/jpeg;base64, @imageBase64" style="width: 400px;" />
+        </div>
+    }
+
+    @*image as url*@
+    @if (ImageURL != null)
+    {
+        <div style="margin: 10px;">
+            <img src="@ImageURL" style="width: 400px;" />
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = "Image";
+
+    [Parameter]
+    public string ImageURL { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSelectedImage { get; set; }    
+
+    ElementReference imageInputRef;
+
+    private string imageBase64;
+
+    private async Task ImageFileSelected()
+    {
+        // read the files that the user is selected from his computer and covert it to Base64 (use library Tewr.Blazor.FileReader)
+        foreach (var file in await fileReaderService.CreateReference(imageInputRef).EnumerateFilesAsync())
+        {
+            //use the MemoryString to get a representation of the image in memory (use 4*1024 buffer size)
+            using (MemoryStream memoryStream = await file.CreateMemoryStreamAsync(4 * 1024))
+            {
+                //initialize image bytes array
+                var imageBytes = new byte[memoryStream.Length];
+                //read bytes from the current stream and writes the data to a buffer
+                memoryStream.Read(imageBytes, 0, (int)memoryStream.Length);
+                //convert image bytes to Base64String
+                imageBase64 = Convert.ToBase64String(imageBytes);
+                //invoke OnSelectedImage event callback
+                await OnSelectedImage.InvokeAsync(imageBase64);
+                //for not display image twice (there are 2 if statements in UI)
+                ImageURL = null;
+                //notify Blazor to rerender the component in order to show image in Base64String
+                StateHasChanged();
+            }
+        }
+    }
+}

@@ -1,0 +1,66 @@
+﻿<EditForm Model="Person" OnValidSubmit="Submit">
+    <DataAnnotationsValidator />
+
+    @*name*@
+    <div class="form-group">
+        <label>Name:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@Person.Name" />
+            <ValidationMessage For="@(() => Person.Name)" />
+        </div>
+    </div>
+
+    @*birthdate*@
+    <div class="form-group">
+        <label>Birth date:</label>
+        <div>
+            <InputDate class="form-control" @bind-Value="@Person.BirthDate" />
+            <ValidationMessage For="@(() => Person.BirthDate)" />
+        </div>
+    </div>
+
+    @*biography*@
+    <div class="form-group form-markdown">
+        <MarkdownInput @bind-Value="Person.Biography" Label="Biography" ForLambda="@(() => Person.Biography)"/>
+    </div>
+
+    @*photo*@
+    <div class="form-group">
+        <ImageInput Label="Photo" OnSelectedImage="PictureSelected" ImageURL="@imageUrl" />
+    </div>
+
+    <button class="btn btn-success mt-2" type="submit">Save Changes</button>
+
+    <p>Validation summary:</p>
+    @*summarize all validation rules and show summary validation error message*@
+    <ValidationSummary />
+</EditForm>
+
+@code {
+    [Parameter]
+    public Person Person { get; set; }
+
+    [Parameter]
+    public EventCallback Submit { get; set; }
+
+    private string imageUrl;
+
+    private void PictureSelected(string imageBase64)
+    {
+        Person.Photo = imageBase64;
+        imageUrl = null;
+        // Console.WriteLine(imageBase64);
+    }
+
+    protected override void OnInitialized()
+    {
+        //if update person Person.Photo may have a value
+        if (!string.IsNullOrEmpty(Person.Photo))
+        {                       
+            imageUrl = Person.Photo;
+            //to prevent sending the image again if the image is not updated
+            //if the user update a person that have a photo, but the photo is not updated -> we do not need to send the picture every time when we update a person
+            Person.Photo = null;
+        }
+    }
+}

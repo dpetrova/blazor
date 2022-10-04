@@ -1,0 +1,29 @@
+﻿@*using Markdig library for Markdown support*@
+@using Markdig
+
+@if (htmlContent != null)
+{
+    @*direct render of html*@
+    @((MarkupString)htmlContent)
+}
+
+@code {
+    [Parameter]
+    public string MarkdownContent { get; set; }
+
+    //store html representation of markdown content
+    private string htmlContent;
+
+    //run the method every time when MarkdownContent is updated
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrEmpty(MarkdownContent))
+        {
+            htmlContent = Markdown.ToHtml(MarkdownContent);
+        }
+        else
+        {
+            htmlContent = null;
+        }
+    }
+}
