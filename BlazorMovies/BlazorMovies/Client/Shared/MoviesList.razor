@@ -1,5 +1,6 @@
 ﻿@*inject service for invoking JS functions*@
 @inject IJSRuntime js;
+@inject IMoviesRepository moviesRepository
 
 @*checbox for allowing/or not to manipulate movies*@
 @*using data binding:*@
@@ -29,7 +30,7 @@
             @*<IndividualMovie Movie="context" DisplayButtons="allowedToManipulate" DeleteMovie="Delete" />*@
 
             @*access passed variable to generic render fragment as it set in Context*@
-            <IndividualMovie Movie="movie" DisplayButtons="allowedToManipulate" DeleteMovie="Delete" />
+            <IndividualMovie @key="movie.Id" Movie="movie" DisplayButtons="allowedToManipulate" DeleteMovie="Delete" />
         </ItemTemplate>
     </GenericList>
 </div>
@@ -56,9 +57,10 @@
     //create a reference to Confirmation dialog
     Confirmation confirmation;    
 
-    private void ConfirmDelete()
+    private async Task ConfirmDelete()
     {
-        Movies.Remove(targetMovie);
+        //Movies.Remove(targetMovie);
+        await moviesRepository.DeleteMovie(targetMovie.Id);
         confirmation.Hide();
         targetMovie = null;
         //js.Log($"The movie {targetMovie.Title} is deleted!");

@@ -20,6 +20,11 @@ builder.Services.AddRazorPages();
 builder.Services.AddDbContext<ApplicationDbContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+//help us to serialize entities that have circular references
+builder.Services.AddMvc().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+//configure automapper (to map values of objects and updated only the values that have changed)
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 //for store files in Azure Storage
 //builder.Services.AddScoped<IFileStorageService, AzureStorageService>();

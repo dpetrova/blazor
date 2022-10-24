@@ -1,4 +1,6 @@
 ﻿@page "/people/edit/{PersonId:int}"
+@inject IPeopleRepository peopleRepository
+@inject NavigationManager navigationManager
 
 <h3>Edit Person</h3>
 
@@ -13,14 +15,14 @@
 
     public Person person;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        //TODO: get person by Id from DB
-        person = new Person() { Id = PersonId, Name = "Harrison Ford", BirthDate = new DateTime(1942, 7, 13), Biography = "Harrison Ford is an American actor." };
+        person = await peopleRepository.GetPersonById(PersonId);
     }
 
-    private void Edit()
+    private async Task Edit()
     {
-        Console.WriteLine($"Edit person {person.Name}");
+        await peopleRepository.UpdatePerson(person);
+        navigationManager.NavigateTo("people");
     }
 }

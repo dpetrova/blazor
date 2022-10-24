@@ -3,28 +3,44 @@
 @*NavigationManager service is used to programatically navigate user to another pages of the application*@
 @inject NavigationManager navigationManager
 
+@inject IMoviesRepository moviesRepository
+@inject IGenreRepository genreRepository
+
 <h3>Create Movie</h3>
 
-<MovieForm Movie="movie" NotSelectedGenres="genres" Submit="SaveMovie" />
+@if(genres != null)
+{
+    <MovieForm Movie="movie" NotSelectedGenres="genres" Submit="SaveMovie" />
+}
+
 
 @code {
     private Movie movie = new Movie();
 
-    private List<Genre> genres = new List<Genre>()
-    {
-        new Genre(){Id=1, Name="Action"},
-        new Genre(){Id=2, Name="Comedy"},
-        new Genre(){Id=3, Name="SciFi"}
-    };
+    private List<Genre> genres;
 
-    private void SaveMovie()
+    protected override async Task OnInitializedAsync()
     {
-        //saving movie...
+        genres = await genreRepository.GetGenres();
+    }
 
-        //current URL at which the user is
-        Console.WriteLine(navigationManager.Uri);
-        //redirect user to /movie
-        navigationManager.NavigateTo("/");
+    private async Task SaveMovie()
+    {
+        try
+        {
+            var movieId = await moviesRepository.CreateMovie(movie);
+            //redirect user to /movie
+            navigationManager.NavigateTo($"movie/{movieId}/{movie.Title.Replace(" ", "-")}");
+
+            //current URL at which the user is
+            //Console.WriteLine(navigationManager.Uri);
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+
+        
     }
 
 }

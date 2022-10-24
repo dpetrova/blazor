@@ -1,4 +1,5 @@
 ﻿@page "/people"
+@inject IPeopleRepository peopleRepository
 
 <h3>People Index</h3>
 
@@ -6,7 +7,70 @@
     <a class="btn btn-info" href="people/create">New Person</a>
 </div>
 
+<GenericList List="people">
+    <WholeListTemplate>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in people)
+                {
+                    <tr>
+                        <td>
+                            <a href="/people/edit/@item.Id" class="btn btn-success">Edit</a>
+                            <button @onclick="@(() => DeletePerson(item.Id))" class="btn btn-danger">Del</button>
+                        </td>
+                        <td>@item.Name</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </WholeListTemplate>
+</GenericList>
+
+<Pagination CurrentPage="@paginationDTO.Page" TotalPages="totalPages" SelectPage="SelectPage" />
 
 @code {
+    private List<Person> people;
+    private PaginationDTO paginationDTO = new PaginationDTO() {RecordsPerPage = 2};
+    private int totalPages;
 
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadPeople();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private async Task LoadPeople()
+    {        
+        //get not paginated data
+        //people = await peopleRepository.GetPeople();
+
+        //get paginated data
+        var paginatedResponse = await peopleRepository.GetPeople(paginationDTO);
+        people = paginatedResponse.Response;
+        totalPages = paginatedResponse.TotalPages;
+    }
+
+    private async Task DeletePerson(int id)
+    {
+        await peopleRepository.DeletePerson(id);
+        await LoadPeople();
+    }
+
+    private async Task SelectPage(int page)
+    {
+        paginationDTO.Page = page;
+        await LoadPeople();
+    }
 }

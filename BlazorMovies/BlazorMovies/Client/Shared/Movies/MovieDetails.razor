@@ -1,8 +1,54 @@
 ﻿@*declare route parameters MovieId if type int and MovieName of type string, as we don't have to use parameter restrictions (:string) for string types*@
 @page "/movie/{MovieId:int}"
 @page "/movie/{MovieId:int}/{MovieName}"
+@inject IMoviesRepository movieRepository
 
-<h3>MovieDetails</h3>
+@if(model == null)
+{
+    <text>Loading...</text>
+}
+else
+{
+    <h2>@model.Movie.Title (@model.Movie.ReleaseDate.Value.ToString("yyyy"))</h2>
+    <h3>Genres:</h3>
+    @for (int i = 0; i < model.Genres.Count; i++)
+    {
+        @if (i < model.Genres.Count - 1)
+        {
+            @linkGenre(model.Genres[i])<text>, </text>
+        }
+        else
+        {
+            @linkGenre(model.Genres[i])
+        }        
+    }
+    <h5>@model.Movie.ReleaseDate.Value.ToString("dd MMM yyyy")</h5>
+    <div style="display: flex">
+        <span style="display: inline-block; margin-right: 5px"></span>
+        <img src="@model.Movie.Poster" style="width: 225px; height: 315px" />
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/@model.Movie.Trailer" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <div style="margin-top: 10px">
+        <h3>Summary:</h3>
+        <MarkdownRender MarkdownContent="@model.Movie.Summary"/>
+    </div>
+    <div style="margin-top: 10px">
+        <h3>Actors:</h3>
+        <div style="display: flex; flex-direction: column">
+            @foreach (var actor in model.Actors)
+            {
+                <div style="margin-bottom: 2px">
+                    <img src="@actor.Photo" style="width: 50px"/>
+                    <span style="display: inline-block; width: 200px">
+                        <a href="/people/edit/@actor.Id">@actor.Name</a>
+                    </span>
+                    <span style="display: inline-block; width: 45px">...</span>
+                    <span>@actor.Character</span>
+                </div>
+            }
+        </div>
+    </div>
+}
 
 @code {
     [Parameter]
@@ -10,9 +56,11 @@
     [Parameter]
     public string MovieName { get; set; }
 
-    protected override void OnInitialized()
+    private MovieDetailsDTO model;
+    private RenderFragment<Genre> linkGenre = (genre) =>@<a href="movies/search?genreId=@genre.Id">@genre.Name</a>;
+
+    protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine(MovieId);
-        Console.WriteLine(MovieName);
+        model = await movieRepository.GetMovieDetailsDTO(MovieId);
     }
 }

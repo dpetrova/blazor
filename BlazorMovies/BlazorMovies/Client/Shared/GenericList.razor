@@ -3,7 +3,7 @@
 
 <div>
     @if (List == null)
-    {        
+    {
         @if (LoadingTemplate != null)
         {
             @LoadingTemplate
@@ -29,9 +29,8 @@
     }
     else
     {
-        <div>
-           
-
+        @if (ItemTemplate != null)
+        {
             @*Loop over list*@
             @foreach (var item in List)
             {
@@ -42,12 +41,16 @@
             @*
             @foreach (var item in List.Select((value, index) => (value, index)))
             {
-                <div style="background-color: @(item.index % 2 == 0 ? "grey" : "lightgrey")">
-                    @ItemTemplate(item.value)
-                </div>
+            <div style="background-color: @(item.index % 2 == 0 ? "grey" : "lightgrey")">
+            @ItemTemplate(item.value)
+            </div>
             }
             *@
-        </div>
+        }
+        else
+        {
+            @WholeListTemplate
+        }
     }
 </div>
 
@@ -63,5 +66,7 @@
     public RenderFragment LoadingTemplate { get; set; }
     [Parameter]
     public RenderFragment<TItem> ItemTemplate { get; set; }
+    [Parameter]
+    public RenderFragment WholeListTemplate { get; set; }
 
 }

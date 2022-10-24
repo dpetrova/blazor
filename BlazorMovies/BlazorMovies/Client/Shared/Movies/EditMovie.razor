@@ -1,37 +1,39 @@
 ﻿@page "/movies/edit/{MovieId:int}"
+@inject IMoviesRepository moviesRepository
+@inject NavigationManager navigationManager
 
 <h3>Edit Movie</h3>
 
 @if (movie != null)
 {
-    <MovieForm Movie="movie" SelectedGenres="selectedGenres" NotSelectedGenres="notSelectedGenres" Submit="Edit" />
+    <MovieForm Movie="movie" SelectedGenres="selectedGenres" NotSelectedGenres="notSelectedGenres" SelectedActors="selectedActors" Submit="Edit" />
 }
 
 @code {
     [Parameter]
     public int MovieId { get; set; }
 
-    public Movie movie;
+    private Movie movie;    
+    private List<Genre> selectedGenres;
+    private List<Genre> notSelectedGenres;
+    private List<Person> selectedActors;
 
-    private List<Genre> notSelectedGenres = new List<Genre>()
-    {        
-        new Genre(){Id=2, Name="Comedy"}        
-    };
-
-    private List<Genre> selectedGenres = new List<Genre>()
+    protected async override Task OnInitializedAsync()
     {
-        new Genre(){Id=1, Name="Action"},        
-        new Genre(){Id=3, Name="SciFi"}
-    };
+        //movie = new Movie() { Id = MovieId, Title = "Indiana Jones 5", ReleaseDate = new DateTime(2023, 6, 30), Summary = "Original title: Untitled Indiana Jones Project.", InTheater = false };
 
-    protected override void OnInitialized()
-    {
-        //TODO: get movie by Id from DB
-        movie = new Movie() { Id = MovieId, Title = "Indiana Jones 5", ReleaseDate = new DateTime(2023, 6, 30), Summary = "Original title: Untitled Indiana Jones Project.", InTheater = false };
+        var model = await moviesRepository.GetMovieForUpdate(MovieId);
+        movie = model.Movie;
+        selectedGenres = model.SelectedGenres;
+        notSelectedGenres = model.NotSelectedGenres;
+        selectedActors = model.Actors;
     }
 
-    private void Edit()
+    private async Task Edit()
     {
-        Console.WriteLine($"Edit movie {movie.Title}");
+        await moviesRepository.UpdateMovie(movie);
+
+        //redirect to /movie
+        navigationManager.NavigateTo($"movie/{MovieId}/{movie.Title.Replace(" ", "-")}");
     }
 }

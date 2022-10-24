@@ -35,6 +35,9 @@ namespace BlazorMovies.Shared.Entities
             }
         }
 
+        //navigational properties -> allow you to navigate and manage relationships in both directions,
+        //returning either a reference object (if the multiplicity is either one or zero-or-one) or a collection (if the multiplicity is many)
         public List<MoviesGenres> MoviesGenres { get; set; } = new List<MoviesGenres>();
+        public List<MoviesActors> MoviesActors { get; set; } = new List<MoviesActors>();
     }
 }

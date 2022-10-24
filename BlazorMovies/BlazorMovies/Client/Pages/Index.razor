@@ -4,12 +4,24 @@
 @*dependency injection of configured (in Program.cs) service*@
 @inject IRepository repository;
 
+@inject IMoviesRepository moviesRepository
+
 
 <PageTitle>Index</PageTitle>
 
-<div>
+@*<div>
     <h3>Movies</h3>
     <MoviesList Movies="movies" />
+</div>*@
+
+<div>
+    <h3>In Theaters</h3>
+    <MoviesList Movies="inTheaters" />
+</div>
+
+<div>
+    <h3>Upcoming Releases</h3>
+    <MoviesList Movies="upcomingReleases" />
 </div>
 
 <label>Search:</label>
@@ -21,18 +33,23 @@
 
 <br />
 
-<button @onclick="AddMovie">Add new movie</button>
+@*<button @onclick="AddMovie">Add new movie</button>*@
 
 
 @code {
-    private List<Movie> movies;
+    //private List<Movie> movies;
+    private List<Movie> inTheaters;
+    private List<Movie> upcomingReleases;
 
     protected async override Task OnInitializedAsync()
     {
-        await Task.Delay(3000);
+        //await Task.Delay(3000);
+        ////delegate obtaining the movies to a service
+        //movies = repository.GetMovies();
 
-        //delegate obtaining the movies to a service
-        movies = repository.GetMovies();
+        var response = await moviesRepository.GetIndexPageDTO();
+        inTheaters = response.InTheatres;
+        upcomingReleases = response.UpcomingReleases;
     }
 
     private async Task<IEnumerable<string>> SearchMethod(string searchText)
@@ -47,9 +64,9 @@
         return new List<string>() { "Harrison Ford", "Carrie Fisher" };
     }
 
-    private void AddMovie()
-    {
-        this.movies.Add(new Movie() { Title = "Star Wars: The Phantom Menace", ReleaseDate = new DateTime(1999, 05, 19) });
-    }
+    //private void AddMovie()
+    //{
+    //    this.movies.Add(new Movie() { Title = "Star Wars: The Phantom Menace", ReleaseDate = new DateTime(1999, 05, 19) });
+    //}
 
 }

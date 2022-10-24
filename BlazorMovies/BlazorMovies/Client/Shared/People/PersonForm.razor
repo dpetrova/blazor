@@ -29,6 +29,14 @@
         <ImageInput Label="Photo" OnSelectedImage="PictureSelected" ImageURL="@imageUrl" />
     </div>
 
+    @*character name*@
+    <div class="form-group">
+        <label>Character:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@Person.Character" />            
+        </div>
+    </div>
+
     <button class="btn btn-success mt-2" type="submit">Save Changes</button>
 
     <p>Validation summary:</p>

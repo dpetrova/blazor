@@ -14,8 +14,8 @@ namespace BlazorMovies.Shared.Entities
         public int PersonId { get; set; }
 
         //navigational properties
-        public Movie Movie { get; set; }
-        public Person Person { get; set; }
+        //public virtual Movie Movie { get; set; }
+        //public virtual Person Person { get; set; }
 
         public string Character { get; set; }
 

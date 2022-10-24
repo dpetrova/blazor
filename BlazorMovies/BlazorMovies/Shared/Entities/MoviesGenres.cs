@@ -14,7 +14,7 @@ namespace BlazorMovies.Shared.Entities
         public int GenreId { get; set; }
 
         //navigational properties
-        public Movie Movie { get; set; }
-        public Genre Genre { get; set; }
+        //public virtual Movie Movie { get; set; }
+        //public virtual Genre Genre { get; set; }
     }
 }

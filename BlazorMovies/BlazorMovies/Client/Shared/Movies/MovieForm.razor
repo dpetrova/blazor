@@ -1,4 +1,6 @@
-﻿<EditForm Model="Movie" OnValidSubmit="Submit">
+﻿@inject IPeopleRepository peopleRepository
+
+<EditForm Model="Movie" OnValidSubmit="OnDataAnnotationsValidated">
     <DataAnnotationsValidator />
 
     @*title*@
@@ -66,7 +68,7 @@
                 </MyResultTemplate>
 
                 <MyListTemplate>
-                    @person.Name                   
+                    @person.Name /  <input type="text" placeholder="Character" @bind="@person.Character" />
                 </MyListTemplate>
             </MultipleSelectorTypeahead>
         </div>
@@ -125,9 +127,26 @@
 
     private async Task<IEnumerable<Person>> SearchMethod(string searchText)
     {
-        await Task.Delay(3000);
-        return new List<Person>() { 
-            new Person() { Id = 1, Name = "Harrison Ford", Photo = "https://upload.wikimedia.org/wikipedia/en/b/be/Han_Solo_depicted_in_promotional_image_for_Star_Wars_%281977%29.jpg" },
-            new Person() { Id = 2, Name = "Carrie Fisher", Photo = "https://upload.wikimedia.org/wikipedia/en/1/1b/Princess_Leia%27s_characteristic_hairstyle.jpg" } };
+        return await peopleRepository.GetPeopleByName(searchText);
+
+        //await Task.Delay(3000);
+        //return new List<Person>() { 
+        //    new Person() { Id = 1, Name = "Harrison Ford", Photo = "https://upload.wikimedia.org/wikipedia/en/b/be/Han_Solo_depicted_in_promotional_image_for_Star_Wars_%281977%29.jpg" },
+        //    new Person() { Id = 2, Name = "Carrie Fisher", Photo = "https://upload.wikimedia.org/wikipedia/en/1/1b/Princess_Leia%27s_characteristic_hairstyle.jpg" } };
+    }
+
+    private async Task OnDataAnnotationsValidated()
+    {
+        //map selected MultipleSelectorModel items to MoviesGenres
+        Movie.MoviesGenres = Selected.Select(x => new MoviesGenres() { GenreId = int.Parse(x.Key) }).ToList();
+        //map selected Person items to MoviesActors
+        Movie.MoviesActors = SelectedActors.Select(x => new MoviesActors() { PersonId = x.Id, Character = x.Character }).ToList();
+
+        if (!string.IsNullOrEmpty(Movie.Poster))
+        {
+            imageUrl = null;
+        }
+
+        await Submit.InvokeAsync(null);
     }
 }
