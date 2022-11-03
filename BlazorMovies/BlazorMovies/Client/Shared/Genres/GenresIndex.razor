@@ -1,6 +1,11 @@
 ﻿@page "/genres"
 @inject IGenreRepository genreRepository
 
+@*authorize routable component*@
+@*@using Microsoft.AspNetCore.Authorization*@
+@*@attribute [Authorize]*@
+@attribute [Authorize(Roles = "Admin")]
+
 <h3>Genres Index</h3>
 
 <div class="form-group">

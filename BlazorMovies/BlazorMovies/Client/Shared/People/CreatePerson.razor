@@ -1,6 +1,7 @@
 ﻿@page "/people/create"
 @inject IPeopleRepository peopleRepository
 @inject NavigationManager navigationManager
+@attribute [Authorize(Roles = "Admin")]
 
 <h3>Create Person</h3>
 

@@ -2,6 +2,8 @@
 @page "/movie/{MovieId:int}"
 @page "/movie/{MovieId:int}/{MovieName}"
 @inject IMoviesRepository movieRepository
+@inject IRatingRepository ratingRepository
+@inject IDisplayMessage displayMessage //service to talk to 3rd party js library
 
 @if(model == null)
 {
@@ -23,6 +25,10 @@ else
         }        
     }
     <h5>@model.Movie.ReleaseDate.Value.ToString("dd MMM yyyy")</h5>
+    <h5>Average Rating: @model.AverageVote.ToString("0.#") | Your Vote: 
+    <Rating MaximumRating="5" SelectedRating="model.UserVote" OnVote="OnVote"/>
+    </h5>
+
     <div style="display: flex">
         <span style="display: inline-block; margin-right: 5px"></span>
         <img src="@model.Movie.Poster" style="width: 225px; height: 315px" />
@@ -62,5 +68,13 @@ else
     protected override async Task OnInitializedAsync()
     {
         model = await movieRepository.GetMovieDetailsDTO(MovieId);
+    }
+
+    private async Task OnVote(int selectedRate)
+    {
+        model.UserVote = selectedRate;
+        var movieRating = new MovieRating() { Rate = selectedRate, MovieId = MovieId };
+        await ratingRepository.Vote(movieRating);
+        await displayMessage.DisplaySuccessMessage("You vote has been received!");
     }
 }

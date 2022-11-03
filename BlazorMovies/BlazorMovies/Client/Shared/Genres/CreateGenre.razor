@@ -1,6 +1,7 @@
 ﻿@page "/genres/create"
 @inject IGenreRepository genreRepository
 @inject NavigationManager navigationManager
+@attribute [Authorize(Roles = "Admin")]
 
 <h3>Create Genre</h3>
 

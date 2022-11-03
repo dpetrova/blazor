@@ -2,6 +2,8 @@
 using BlazorMovies.Server.Helpers;
 using BlazorMovies.Shared.DTO;
 using BlazorMovies.Shared.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,7 @@ namespace BlazorMovies.Server.Controllers
 {
     [ApiController]
     [Route("/api/[controller]")] //point to api/people (name of the cotroller)
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] //protect all routes (user need to provide valid jwt)
     public class PeopleController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -27,6 +30,7 @@ namespace BlazorMovies.Server.Controllers
         //endpoints
 
         [HttpGet]
+        [AllowAnonymous] /*allow not authorized users*/
         public async Task<ActionResult<List<Person>>> Get([FromQuery] PaginationDTO paginationDTO) //[FromQuery] specifies that parameter is coming from the query string
         {
             // not paginated data
@@ -39,6 +43,7 @@ namespace BlazorMovies.Server.Controllers
         }
 
         [HttpGet("search/{searchText}")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Person>>> FilterByName(string searchText)
         {
             if(string.IsNullOrWhiteSpace(searchText))
@@ -53,6 +58,7 @@ namespace BlazorMovies.Server.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<Person>> GetById(int id)
         {
             var person = await context.People.FirstOrDefaultAsync(x => x.Id == id);

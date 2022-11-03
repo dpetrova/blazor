@@ -7,11 +7,18 @@
     </p>
     <p>Release: @Movie.ReleaseDate.Value.ToString("dd MMM yyyy")</p>
     <div>
-        <a href="/movies/edit/@Movie.Id" class="btn btn-info">Edit</a>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <a href="/movies/edit/@Movie.Id" class="btn btn-info">Edit</a>
+                <button type="button" class="btn btn-danger" onclick="@(() => DeleteMovie.InvokeAsync(Movie))">Delete</button>
+            </Authorized>            
+        </AuthorizeView>
+
+       @* <a href="/movies/edit/@Movie.Id" class="btn btn-info">Edit</a>
         @if (DisplayButtons)
         {
             <button type="button" class="btn btn-danger" onclick="@(() => DeleteMovie.InvokeAsync(Movie))">Delete</button>
-        }
+        }*@
     </div>
 </div>
 

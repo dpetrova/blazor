@@ -6,15 +6,30 @@
 <Router AppAssembly="@typeof(App).Assembly" PreferExactMatches="@true">
     @*show this when route match url*@
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        @*no authorization*@
+        @*<RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />*@
+
+        @*use authorization*@
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            @*if want custom authorizing message*@
+            <Authorizing>
+                <text>Authorizing......</text>
+            </Authorizing>
+            @*if want custom not authorized message*@
+            <NotAuthorized>
+                You are not allowed to view this page
+            </NotAuthorized>
+        </AuthorizeRouteView>
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
     @*show this when route does not match url*@
     <NotFound>
         <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            @*show custom 4040 not found page component*@
-            <NotFound />
-        </LayoutView>
+        <CascadingAuthenticationState>
+            <LayoutView Layout="@typeof(MainLayout)">
+                @*show custom 404 not found page component*@
+                <NotFound />
+            </LayoutView>
+        </CascadingAuthenticationState>
     </NotFound>
 </Router>

@@ -3,11 +3,17 @@
 
 @*dependency injection of configured (in Program.cs) service*@
 @inject IRepository repository;
-
 @inject IMoviesRepository moviesRepository
 
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        You are authorized, @context.User.Identity.Name
+    </Authorized>
+    <NotAuthorized>
+        You are not authorized
+    </NotAuthorized>
+</AuthorizeView>
 
-<PageTitle>Index</PageTitle>
 
 @*<div>
     <h3>Movies</h3>

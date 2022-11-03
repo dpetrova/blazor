@@ -1,4 +1,5 @@
 ﻿@page "/movies/create"
+@attribute [Authorize(Roles = "Admin")]
 
 @*NavigationManager service is used to programatically navigate user to another pages of the application*@
 @inject NavigationManager navigationManager

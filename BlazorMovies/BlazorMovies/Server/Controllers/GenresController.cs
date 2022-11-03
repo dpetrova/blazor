@@ -1,4 +1,6 @@
 ﻿using BlazorMovies.Shared.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +20,7 @@ namespace BlazorMovies.Server.Controllers
 
         //endpoints
 
-        [HttpGet]
+        [HttpGet]        
         public async Task<ActionResult<List<Genre>>> Get()
         {
             return await context.Genres.ToListAsync();
@@ -39,6 +41,7 @@ namespace BlazorMovies.Server.Controllers
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] //protect route (user need to provide valid jwt)
         public async Task<ActionResult<int>> Post(Genre genre)
         {
             context.Add(genre);
@@ -49,6 +52,7 @@ namespace BlazorMovies.Server.Controllers
         }
 
         [HttpPut]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] //protect route (user need to provide valid jwt)
         public async Task<ActionResult<int>> Put(Genre genre)
         {
             context.Attach(genre).State = EntityState.Modified;
@@ -57,6 +61,7 @@ namespace BlazorMovies.Server.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] //protect route (user need to provide valid jwt)
         public async Task<ActionResult> Delete(int id)
         {
             var genre = await context.Genres.FirstOrDefaultAsync(x => x.Id == id);

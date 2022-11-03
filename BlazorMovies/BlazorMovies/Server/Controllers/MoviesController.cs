@@ -2,6 +2,9 @@
 using BlazorMovies.Server.Helpers;
 using BlazorMovies.Shared.DTO;
 using BlazorMovies.Shared.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -10,22 +13,26 @@ namespace BlazorMovies.Server.Controllers
 {
     [ApiController]
     [Route("/api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] //protect route (user need to provide valid jwt)
     public class MoviesController : ControllerBase
     {
         private readonly ApplicationDbContext context;
         private readonly IFileStorageService fileStorageService;
         private readonly IMapper mapper; //auto mapper between onjects
+        private readonly UserManager<IdentityUser> userManager;
 
-        public MoviesController(ApplicationDbContext context, IFileStorageService fileStorageService, IMapper mapper)
+        public MoviesController(ApplicationDbContext context, IFileStorageService fileStorageService, IMapper mapper, UserManager<IdentityUser> userManager)
         {
             this.context = context;
             this.fileStorageService = fileStorageService;
             this.mapper = mapper;
+            this.userManager = userManager;
         }
 
         //endpoints
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IndexPageDTO>> Get()
         {
             int limit = 6;
@@ -50,14 +57,13 @@ namespace BlazorMovies.Server.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<MovieDetailsDTO>> GetMovieDetails(int id)
         {
             var movie = await context.Movies
                 .Where(x => x.Id == id)
-                //.Include(x => x.MoviesGenres).ThenInclude(x => x.Genre) // join
-                //.Include(x => x.MoviesActors).ThenInclude(x => x.Person) // join
-                .Include(x => x.MoviesGenres) // join
-                .Include(x => x.MoviesActors) // join
+                .Include(x => x.MoviesGenres).ThenInclude(x => x.Genre) // join
+                .Include(x => x.MoviesActors).ThenInclude(x => x.Person) // join
                 .FirstOrDefaultAsync();
 
             if (movie == null)
@@ -65,35 +71,56 @@ namespace BlazorMovies.Server.Controllers
                 return NotFound();
             }
 
+            //rating
+            var voteAverage = 0.0;
+            var userVote = 0;
+
+            if (await context.MovieRatings.AnyAsync(x => x.MovieId == id))
+            {
+                //calc average rating of all votes for the movie
+                voteAverage = await context.MovieRatings
+                    .Where(x => x.MovieId == id)
+                    .AverageAsync(x => x.Rate);
+
+                if (HttpContext.User.Identity.IsAuthenticated)
+                {
+                    //get current user
+                    var user = await userManager.FindByEmailAsync(HttpContext.User.Identity.Name);
+                    //get vote of the user
+                    var userVoteDB = await context.MovieRatings
+                        .FirstOrDefaultAsync(x => x.MovieId == id && x.UserId == user.Id);
+
+                    if (userVoteDB != null)
+                    {
+                        userVote = userVoteDB.Rate;
+                    }
+                }
+            }
+
+            //actors and genres
             movie.MoviesActors = movie.MoviesActors.OrderBy(x => x.Order).ToList();
 
             var response = new MovieDetailsDTO();
             response.Movie = movie;
-            //response.Genres = movie.MoviesGenres.Select(x => x.Genre).ToList();
-            //response.Actors = movie.MoviesActors.Select(x =>
-            //  new Person
-            //  {
-            //      Name = x.Person.Name,
-            //      Photo = x.Person.Photo,
-            //      Character = x.Person.Photo,
-            //      Id = x.PersonId
-
-            //  }).ToList();
-            response.Genres = movie.MoviesGenres.Select(x =>
-                new Genre
-                {
-                    Name = "Some..."
-                }).ToList();
+            response.Genres = movie.MoviesGenres.Select(x => x.Genre).ToList();
             response.Actors = movie.MoviesActors.Select(x =>
-                new Person
-                {
-                    Name = x.Character
-                }).ToList();
+              new Person
+              {
+                  Name = x.Person.Name,
+                  Photo = x.Person.Photo,
+                  Character = x.Character,
+                  Id = x.PersonId
+
+              }).ToList();
+
+            response.UserVote = userVote;
+            response.AverageVote = voteAverage;
 
             return response;
         }
 
-        [HttpPost]
+
+        [HttpPost]        
         public async Task<ActionResult<int>> Post(Movie movie)
         {
             //save picture
@@ -119,6 +146,7 @@ namespace BlazorMovies.Server.Controllers
         }
 
         [HttpPost("filter")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Movie>>> Filter([FromBody] FilterMoviesDTO filterMoviesDTO)
         {
             var moviesQueryable = context.Movies.AsQueryable();
