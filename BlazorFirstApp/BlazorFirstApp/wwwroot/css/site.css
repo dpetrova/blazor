@@ -150,3 +150,12 @@ a, .btn-link {
     margin: 0 1.5rem;
 }
 
+.red-background {
+    background: red;
+    color: white;
+}
+
+.yellow-background {
+    background: yellow;
+    color: black;
+}
