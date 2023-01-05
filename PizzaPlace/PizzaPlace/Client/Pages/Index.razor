@@ -1,0 +1,51 @@
+﻿@page "/"
+
+<!-- Menu -->
+<h1>Our selection of pizzas</h1>
+@foreach (var pizza in State.Menu.Pizzas)
+{
+    <div class="row">
+        <div class="col">
+            @pizza.Name
+        </div>
+        <div class="col">
+            @pizza.Price
+        </div>
+        <div class="col">
+            <img src="@SpicinessImage(pizza.Spiciness)"
+             alt="@pizza.Spiciness" />
+        </div>
+        <div class="col">
+            @*@onclick event handler uses a lambda function to can pass the pizza variable (known as a closure)*@
+            <button class="btn btn-success"
+                @onclick="@(() => AddToBasket(pizza))">
+                Add
+            </button>
+        </div>
+    </div>
+}
+<!-- End menu -->
+
+@code {
+    private State State { get; } = new State()
+        {
+            Menu = new Menu
+            {
+                Pizzas = new List<Pizza> {
+                    new Pizza(1, "Pepperoni", 8.99M, Spiciness.Spicy ),
+                    new Pizza(2, "Margarita", 7.99M, Spiciness.None ),
+                    new Pizza(3, "Diabolo", 9.99M, Spiciness.Hot )
+                }
+            }
+        };
+
+    /* convert the name of the enumeration’s value into the URL of an image file (found in the wwwroot/images folder)  */
+    private string SpicinessImage(Spiciness spiciness) => $"images/{spiciness.ToString().ToLower()}.png";
+
+    /* add pizzas to the shopping basket */
+    private void AddToBasket(Pizza pizza)
+    {
+        Console.WriteLine($"Added pizza {pizza.Name}");
+        State.Basket.Add(pizza.Id);
+    }
+}
