@@ -26,6 +26,37 @@
 }
 <!-- End menu -->
 
+<!-- Shopping Basket -->
+@if (State.Basket.Orders.Any())
+{
+    <h1>Your current order</h1>
+    @*
+    use LINQ Select method to take an element's id from the Basket.Orders collection and the position in the collection;
+    use these to create tuples and iterating over a list of tuples
+    *@
+    @foreach (var (pizza, pos) in State.Basket.Orders.Select((id, pos) => (State.Menu.GetPizza(id), pos)))
+    {
+        <div class="row">
+            <div class="col">
+                @pizza.Name
+            </div>
+            <div class="col">
+                @pizza.Price
+            </div>
+            <div class="col">
+                <button class="btn btn-danger" @onclick="@(() => RemoveFromBasket(pos))">
+                    Remove
+                </button>
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="col"> Total:</div>
+        <div class="col"> @State.TotalPrice </div>
+        <div class="col"> </div>
+    </div>
+}
+<!-- End shopping basket -->
 @code {
     private State State { get; } = new State()
         {
@@ -42,10 +73,17 @@
     /* convert the name of the enumeration’s value into the URL of an image file (found in the wwwroot/images folder)  */
     private string SpicinessImage(Spiciness spiciness) => $"images/{spiciness.ToString().ToLower()}.png";
 
-    /* add pizzas to the shopping basket */
+    /* add pizza to the shopping basket */
     private void AddToBasket(Pizza pizza)
     {
         Console.WriteLine($"Added pizza {pizza.Name}");
         State.Basket.Add(pizza.Id);
+    }
+
+    /* remove pizza from the shopping basket */
+    private void RemoveFromBasket(int pos)
+    {
+        Console.WriteLine($"Removing pizza at pos {pos}");
+        State.Basket.RemoveAt(pos);
     }
 }
