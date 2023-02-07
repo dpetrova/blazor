@@ -1,0 +1,17 @@
+﻿@if (Show)
+{
+    <div class="alert alert-secondary mt-4" role="alert">
+        @*use @ChildContent if you want to access the nested element in the component*@
+        @ChildContent
+    </div>
+}
+
+@code {
+    //[Parameter] attribute is required for components that want to expose their public properties to the parent component
+    //This way we can pass data to nested components
+    [Parameter]
+    public bool Show { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

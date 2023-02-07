@@ -1,0 +1,21 @@
+﻿@*a templated component -> it states the TItem as a type parameter using the @typeparam TItem syntax
+you can have more than one type parameter -> list each type parameter using the @typeparam syntax*@
+
+@typeparam TItem
+
+<ul>
+    @foreach (var item in Items)
+    {
+        @*use the @ItemTemplate(item) razor syntax to apply the ItemTemplate parameter*@
+        @ItemTemplate(item)
+    }
+</ul>
+
+@code {
+    /*a Razor template is a way to define a UI snippet*/
+    [Parameter]
+    public RenderFragment<TItem> ItemTemplate { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<TItem> Items { get; set; }
+}

@@ -17,7 +17,36 @@ Welcome to your new app.
 @*included component with param*@
 <Counter IncrementAmount="10" />
 
+@*components*@
+<DismissableAlert @bind-Show="@ShowAlert">
+    <span class="oi oi-check mr-2" aria-hidden="true"></span>
+    <strong>Blazor is soo cool!</strong>
+</DismissableAlert>
+<button @onclick="@ToggleAlert">Toggle</button>
+
+<TimerComponent TimeInSeconds="5" Tick="@ToggleAlert" />
+
 @code {
     //use cascading parameter from MainLayout
     [CascadingParameter(Name = "User")] protected string User { get; set; }
+
+    private bool showAlert = true;
+
+    public bool ShowAlert
+    {
+        get => showAlert;
+        set
+        {
+            if (value != showAlert)
+            {
+                showAlert = value;
+                //manually trigger the UI to update by calling the StateHasChanged method
+                //this.StateHasChanged();
+            }
+        }
+    }
+
+    public void ToggleAlert() { 
+        ShowAlert = !ShowAlert;        
+    }
 }
