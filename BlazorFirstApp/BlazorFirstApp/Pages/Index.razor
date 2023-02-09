@@ -46,7 +46,60 @@ Welcome to your new app.
         }
     }
 
-    public void ToggleAlert() { 
-        ShowAlert = !ShowAlert;        
+    public void ToggleAlert()
+    {
+        ShowAlert = !ShowAlert;
+    }
+
+
+    /* Component Life Cycle Hooks */
+
+    // are called when your component has been completely initialized
+    // implement these methods if you want to do some extra initialization after the component has been created, e.g. fetching some data from a server
+    protected override void OnInitialized() { }
+    protected override async Task OnInitializedAsync() { }
+
+    // are called after the parameters have been data-bound
+    // every time data binding updates one or more of your parameters, these methods get called again
+    // they are ideal for calculated properties, filtering, retrieving values from a database that depend on a parameter value, and so on
+    protected override void OnParametersSet() { }
+    protected override async Task OnParametersSetAsync() { }
+
+    // use it if you need to execute some code before the parameters are set
+    // you can find the parameters in the ParameterView argument which behaves like a dictionary
+    int Param = 0;
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.TryGetValue(nameof(Param), out int par))
+        {
+            if (par % 2 == 1)
+            {
+                par += 1;
+                this.Param = par;
+                this.StateHasChanged(); //when you don’t call the base method, the UI doesn’t update, so you should call StateHasChanged
+                return;
+            }
+        }
+        await base.SetParametersAsync(parameters);
+    }
+
+    // are called after Blazor has completely rendered the component, this means that the browser’s DOM has been updated with changes made to your Blazor component
+    // use these methods to invoke JavaScript code that needs access to elements from the DOM
+    // avoid calling StateHasChanged in this method, as it can cause an infinite loop
+    protected override void OnAfterRender(bool firstRender) { }
+    protected override async Task OnAfterRenderAsync(bool firstRender) { }
+
+    // method returns a Boolean value, indicating if the component should be re-rendered
+    // use this method to stop the component from re-rendering, e.g. when making lots of changes resulting in the UI updating too much
+    protected override bool ShouldRender() {
+        return false;
+    }
+
+    // if you need to run some cleanup code when your component is removed from the UI, implement IDisposable
+    // most of the time dependency injection will take care of calling Dispose, so generally, you won’t need to implement IDisposable if you only need to dispose of your dependencies
+    @implements IDisposable
+    public void Dispose()
+    {
+        // Cleanup resources here
     }
 }
