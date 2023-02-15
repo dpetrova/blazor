@@ -1,0 +1,25 @@
+﻿<h1>@Title</h1>
+
+@foreach (var pizza in Menu.Pizzas)
+{
+    <PizzaItem 
+        Pizza="@pizza"
+        ButtonClass="btn btn-success"
+        ButtonTitle="Order"
+        Selected="@Selected"
+    />
+}
+
+@code {
+    // title
+    [Parameter]
+    public string Title { get; set; }
+
+    // pizas list
+    [Parameter]
+    public Menu Menu { get; set; }
+
+    // event callback which you invoke by clicking the button next to a pizza
+    [Parameter]
+    public EventCallback<Pizza> Selected { get; set; }
+}

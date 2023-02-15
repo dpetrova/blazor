@@ -1,0 +1,76 @@
+﻿<h1>@Title</h1>
+
+@*EditForm component will render as the HTML <form> element and it is used to wrap all the inputs that require validation.
+  Set the Model property to the instance you need to validate.
+  When submit button is clicked, the EditForm component performs validation, and when there are no validation errors, it will call the OnValidSubmit event.*@
+<EditForm OnValidSubmit="@Submit" Model="@Customer">
+    @*indicate that we will use data annotations for validation*@
+    <DataAnnotationsValidator />
+    @*show the summary validation message for all inputs*@
+    <ValidationSummary />
+
+    @*component that watch for model’s property changes*@
+    <InputWatcher @ref="inputWatcher" FieldChanged="@FieldChanged" />
+
+    <div class="form-group row mb-1">
+        <label class="col-sm-3 col-form-label" for="FirstName">Name:</label>
+        <div class="col-sm-9">
+            @*Use InputText component for text field, binding it to the model’s property using the @bind-Value attribute*@
+            <InputText class="form-control" @bind-Value="@Customer.Name" />
+            <ValidationMessage For="@(() => Customer.Name)" />
+        </div>
+    </div>
+    <div class="form-group row mb-1">
+        <label class="col-sm-3 col-form-label" for="LastName">Street:</label>
+        <div class="col-sm-9">
+            <InputText class="form-control" @bind-Value="@Customer.Street" />
+            <ValidationMessage For="@(() => Customer.Street)" />
+        </div>
+    </div>
+    <div class="form-group row mb-1">
+        <label class="col-sm-3 col-form-label" for="Birthday">City:</label>
+        <div class="col-sm-9">
+            <InputText class="form-control" @bind-Value="@Customer.City" />
+            <ValidationMessage For="@(() => Customer.City)" />
+        </div>
+    </div>
+    <div class="form-group mb-0">
+        <button type="submit" id="BtnRegister" class="@ButtonClass" disabled="@isInvalid">
+            @ButtonTitle
+        </button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string ButtonTitle { get; set; }
+
+    [Parameter]
+    public string ButtonClass { get; set; }
+
+    [Parameter]
+    public Customer Customer { get; set; }
+
+    [Parameter]
+    public EventCallback Submit { get; set; }
+
+    /* watcher */
+    private InputWatcher inputWatcher;
+
+    private bool isInvalid = true;
+
+    [Parameter]
+    public EventCallback<Customer> CustomerChanged { get; set; }
+
+    // InputWatcher component invokes the FieldChanged method, which triggers the CustomerChanged callback
+    private void FieldChanged(string fieldName)
+    {
+        CustomerChanged.InvokeAsync(Customer);
+        isInvalid = !inputWatcher.Validate();
+    }
+    
+    /* end of watcher */
+}

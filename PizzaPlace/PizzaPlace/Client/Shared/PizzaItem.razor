@@ -1,0 +1,37 @@
+﻿<div class="row">
+    <div class="col">
+        @Pizza.Name
+    </div>
+    <div class="col">
+        @Pizza.Price
+    </div>
+    <div class="col">
+        <img src="@SpicinessImage(Pizza.Spiciness)" alt="@Pizza.Spiciness" />
+    </div>
+    <div class="col">
+        <button class="@ButtonClass" @onclick="@(async () => await Selected.InvokeAsync(Pizza))">
+            @ButtonTitle
+        </button>
+    </div>
+</div>
+
+@code {
+    // pizza details
+    [Parameter]
+    public Pizza Pizza { get; set; }
+
+    // title of button
+    [Parameter]
+    public string ButtonTitle { get; set; }
+
+    // look of button
+    [Parameter]
+    public string ButtonClass { get; set; }
+
+    // event callback which gets invoked when you click the button
+    [Parameter]
+    public EventCallback<Pizza> Selected { get; set; }
+
+    /* convert the name of the enumeration’s value into the URL of an image file (found in the wwwroot/images folder)  */
+    private string SpicinessImage(Spiciness spiciness) => $"images/{spiciness.ToString().ToLower()}.png";
+}
