@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BlazorMovies.Server.Controllers
 {
     [ApiController]
+    //use the [Route("[controller]")] attribute to set up the endpoint to generically listen to a URI that contains the name of the controller (without the suffix “Controller”)
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
@@ -19,6 +20,7 @@ namespace BlazorMovies.Server.Controllers
             _logger = logger;
         }
 
+        //use the [HttpGet] attribute to set up the method
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {

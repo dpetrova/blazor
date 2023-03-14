@@ -1,5 +1,8 @@
-﻿@page "/fetchdata"
+﻿@*add the path for routing*@
+@page "/fetchdata"
+@*use @using statements in Razor to refer to classes from another namespaceneed (need this because you use the WeatherForecast class from the Shared project)*@
 @using BlazorMovies.Shared
+@*inject the HttpClient instance (HttpClient class is used to talk to the server)*@
 @inject HttpClient Http
 
 <PageTitle>Weather forecast</PageTitle>
@@ -38,10 +41,16 @@ else
 }
 
 @code {
+    // declare a field forecasts to hold an array of WeatherForecast instances; initially, it is a null
     private WeatherForecast[]? forecasts;
 
+    //Blazor components have two methods that get called when the component has been initialized: OnInitialized and OnInitializedAsync.
+    //because you fetch the data from the server using an asynchronous API, you need to use OnInitializedAsync
     protected override async Task OnInitializedAsync()
     {
+        //all communication between the client and the server passes through the HttpClient class
+        //its role is to make the HTTP request to the server and to expose the result from the server
+        //the GetFromJsonAsync<>("SOME URI") extension method makes an asynchronous GET request to the specified URI 
         forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
     }
 }
