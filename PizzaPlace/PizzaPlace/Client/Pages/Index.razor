@@ -1,13 +1,19 @@
 ﻿@*adding the dependencies *@
 @inject IMenuService menuService
 @inject IOrderService orderService
+@inject NavigationManager uriHelper
+
+@*use a State class (with Singleton Pattern every component will share the same State instance),
+and this makes it easy to communicate between components that are not in a parent-child relationship*@
+@inject State State
 
 @page "/"
 
 <!-- Menu -->
 <PizzaList Title="Our selection of pizzas"
            Menu="@State.Menu"
-           Selected="@( async (pizza) => AddToBasket(pizza))" />
+           Selected="@( async (pizza) => AddToBasket(pizza))" 
+           ShowPizzaInformation="ShowPizzaInformation" />
 <!-- End menu -->
 
 <!-- Shopping Basket -->
@@ -28,9 +34,7 @@
 <!-- Only for Debugging -->
 <p>@State.ToJson()</p>
 
-@code {
-    private State State { get; } = new State();       
-    
+@code {    
     // initialize the State.Menu property in the OnInitializedAsync life cycle method
     // never call asynchronous services in your Blazor component’s constructor; always use OnInitializedAsync or OnParametersSetAsync.
     protected override async Task OnInitializedAsync()
@@ -56,5 +60,14 @@
     private async Task PlaceOrder()
     {
         await orderService.PlaceOrder(State.Basket);
+    }
+
+    // sets the State’s CurrentPizza property and navigates using the NavigateTo method to the /PizzaInfo route
+    private void ShowPizzaInformation(Pizza selected)
+    {
+        this.State.CurrentPizza = selected;
+        //if you call NavigateTo as part of a callback, Blazor returns to the original route
+        //that is why need to use a background Task so Blazor will navigate after the callback
+        Task.Run(() => this.uriHelper.NavigateTo("/pizzainfo"));
     }
 }

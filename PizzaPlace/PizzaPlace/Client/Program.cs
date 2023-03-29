@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using PizzaPlace.Client;
 using PizzaPlace.Client.Services;
 using PizzaPlace.Client.Shared;
+using PizzaPlace.Shared;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -20,5 +21,8 @@ builder.Services.AddTransient<IMenuService, MenuService>();
 //builder.Services.AddTransient<IOrderService, ConsoleOrderService>();
 builder.Services.AddTransient<IOrderService, OrderService>();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+//configure dependency injection to inject the State instance as a singleton
+builder.Services.AddSingleton<State>();
 
 await builder.Build().RunAsync();

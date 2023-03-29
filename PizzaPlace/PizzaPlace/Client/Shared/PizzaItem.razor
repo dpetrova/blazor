@@ -1,6 +1,15 @@
 ﻿<div class="row">
     <div class="col">
-        @Pizza.Name
+        @if (ShowPizzaInformation is object)
+        {
+            <a href="" @onclick="@(() => ShowPizzaInformation?.Invoke(Pizza))">
+                @Pizza.Name
+            </a>
+        }
+        else
+        {
+            @Pizza.Name
+        }
     </div>
     <div class="col">
         @Pizza.Price
@@ -34,4 +43,9 @@
 
     /* convert the name of the enumeration’s value into the URL of an image file (found in the wwwroot/images folder)  */
     private string SpicinessImage(Spiciness spiciness) => $"images/{spiciness.ToString().ToLower()}.png";
+
+    //a callback delegate to tell the containing PizzaList component that you want to display more information about the pizza
+    //clicking the pizza name link simply invokes this callback (Dumb and Smart Components pattern)
+    [Parameter]
+    public Action<Pizza> ShowPizzaInformation { get; set; }
 }
