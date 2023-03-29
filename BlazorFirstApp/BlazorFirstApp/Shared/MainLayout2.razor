@@ -1,0 +1,17 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>BlazorFirstApp (Second Layout)</PageTitle>
+
+<div class="page">
+    <div class="sidebar">
+        @*navmenu component*@
+        <NavMenu />
+    </div>
+
+    <main>
+        <article class="content px-4">
+            @*here will be placed the content of the pages*@
+            @Body
+        </article>
+    </main>
+</div>

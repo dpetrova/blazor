@@ -6,6 +6,7 @@
 <Router AppAssembly="@typeof(App).Assembly" PreferExactMatches="@true">
     @*show this layout when routing find page*@
     <Found Context="routeData">
+        @*defines the default layout*@
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>

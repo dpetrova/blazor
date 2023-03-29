@@ -1,4 +1,7 @@
-﻿@page "/todo"
+﻿@*Every component can select which layout to use by stating the name of the layout component with the @layout directive*@
+@layout NestedLayout
+
+@page "/todo"
 
 <h3>Todo (@todos.Count(todo => !todo.IsDone))</h3>
 
