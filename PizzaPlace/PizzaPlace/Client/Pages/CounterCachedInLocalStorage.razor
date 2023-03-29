@@ -1,0 +1,113 @@
+﻿@page "/counter-ls-cached"
+@page "/counter-ls-cached/{CurrentCount:int}"
+
+@inject NavigationManager uriHelper
+@inject IJSRuntime JS
+
+@using PizzaPlace.Client.Services
+@inject ILocalStorage LocalStorage
+
+<h1>Counter</h1>
+<p>
+    Current count:
+    <span>@CurrentCount</span>
+</p>
+
+<input @ref="inputElement" @bind="CurrentCount" />
+
+<button class="btn btn-primary"
+        @onclick="IncrementCount">
+    Click me
+</button>
+<a class="btn btn-primary" href="/">Home</a>
+<button class="btn btn-primary" @onclick="StartFrom50">
+    Start From 50
+</button>
+
+@code {   
+
+    //Blazor will create your component and then call the life cycle methods such as OnInitialized
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            /* wraps the component’s this reference in a DotNetObjectRef and passes it to the blazorLocalStorage.watch js function */
+            //var objRef = DotNetObjectReference.Create(this);
+            //await JS.InvokeVoidAsync("blazorLocalStorage.watch", objRef);
+            //using service
+            await LocalStorage.WatchAsync(this);
+
+            /* override the OnInitializedAsync to retrieve the last stored value from local storage using the window.blazorLocalStorage.get js function
+            as it is possible that there is no value yet, and that is why the InvokeAsync uses a nullable int */
+            //int? c = await JS.InvokeAsync<int?>("blazorLocalStorage.get", nameof(CurrentCount));
+            //using service
+            int? c = await LocalStorage.GetProperty<int?>(nameof(CurrentCount));
+            Console.WriteLine(c);
+            if (c.HasValue)
+            {
+                currentCount = c.Value;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("{0} Exception caught.", e);
+        }        
+    }
+
+    //If you invoke the setFocus function in OnInitialized, the DOM has not been updated with the input element so this will result in a runtime error because the function will receive a null reference
+    //You need to wait for the DOM to be updated, which means that you should only pass the ElementReference to your function in the OnAfterRender/OnAfterRenderAsync method
+    protected override async Task OnAfterRenderAsync(bool first)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("blazorFocus.set", inputElement);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("{0} Exception caught.", e);
+        }
+        
+    }
+
+    private int currentCount = 0;
+
+    private ElementReference inputElement;
+
+    [Parameter]
+    public int CurrentCount
+    {
+        get => currentCount;
+        set
+        {
+            if (currentCount != value)
+            {
+                currentCount = value;
+                //JS.InvokeAsync<string>("blazorLocalStorage.set", nameof(CurrentCount), currentCount);
+                LocalStorage.SetProperty<int>(nameof(CurrentCount), currentCount);
+            }
+        }
+    }
+
+    private void IncrementCount() => CurrentCount += 1;
+
+    private void StartFrom50() => uriHelper.NavigateTo("/counter-ls-cached/50");
+
+    // method that when you change the value in one tab, the other tab will update to the same value automatically
+    // to call .NET method from js method’s arguments and return value need to be JSON serializable, the method must be public, and you need to add the JSInvokable attribute to the method
+    [JSInvokable]
+    public async Task UpdateCounter()
+    {
+        Console.WriteLine("Update");
+        //int? c = await JS.InvokeAsync<int?>("blazorLocalStorage.get", nameof(CurrentCount));
+        int? c = await LocalStorage.GetProperty<int?>(nameof(CurrentCount));
+        if (c.HasValue)
+        {
+            currentCount = c.Value;
+        }
+        this.StateHasChanged();
+    }
+
+    //if there is IJSRuntime related error, try to Hard reload browser with Control Shift R !!!!!!
+}
+
+   

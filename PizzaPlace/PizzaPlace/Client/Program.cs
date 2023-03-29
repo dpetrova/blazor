@@ -25,4 +25,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 //configure dependency injection to inject the State instance as a singleton
 builder.Services.AddSingleton<State>();
 
+// services doing interoperability with JavaScript
+builder.Services.AddSingleton<ILocalStorage, LocalStorage>();
+
 await builder.Build().RunAsync();
