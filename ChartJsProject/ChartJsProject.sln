@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32825.248
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChartJsProject", "ChartJsProject\ChartJsProject.csproj", "{66CE0C54-B6C8-44BA-B696-2E50D31C6D92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "U2U.Components.Chart", "U2U.Components.Chart\U2U.Components.Chart.csproj", "{796A838B-A51A-467F-AF39-E4BCE05AE08D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66CE0C54-B6C8-44BA-B696-2E50D31C6D92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66CE0C54-B6C8-44BA-B696-2E50D31C6D92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66CE0C54-B6C8-44BA-B696-2E50D31C6D92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66CE0C54-B6C8-44BA-B696-2E50D31C6D92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{796A838B-A51A-467F-AF39-E4BCE05AE08D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{796A838B-A51A-467F-AF39-E4BCE05AE08D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{796A838B-A51A-467F-AF39-E4BCE05AE08D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{796A838B-A51A-467F-AF39-E4BCE05AE08D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {08BFF6D9-BAE5-4168-9F70-36C9B0F0B95C}
+	EndGlobalSection
+EndGlobal
